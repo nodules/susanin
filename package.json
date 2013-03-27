@@ -1,0 +1,18 @@
+{
+  "author": "Ruslan Kerimov <rus.kerimov@gmail.com> (http://kerimov.pro)",
+  "name": "jsrouter",
+  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ruslankerimov/router.git"
+  },
+  "scripts": {
+    "test": "make test"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  }
+}
