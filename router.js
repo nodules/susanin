@@ -1,12 +1,140 @@
 (function(global) {
 
-    var hasOwnProp = Object.prototype.hasOwnProperty;
+    var hasOwnProp = Object.prototype.hasOwnProperty,
+        toString = Object.prototype.toString,
+        isArray = function(subject) {
+            return toString.call(subject) === '[object Array]';
+        };
 
-    var toString = Object.prototype.toString;
+    var querystring = {
 
-    var isArray = function(subject) {
-        return toString.call(subject) === '[object Array]';
+        /**
+         * Парсит строку вида "param1=value1&param2=value2&param2&param3=value3"
+         * и возвращает объект:
+         * {
+         *     param1 : value1,
+         *     parma2 : [ value2, '' ],
+         *     param3 : value3
+         * }
+         * Аналог http://nodejs.org/api/querystring.html#querystring_querystring_parse_str_sep_eq
+         * @static
+         * @param {String} query
+         * @param {String} [sep='&']
+         * @param {String} [eq='=']
+         * @return {Object}
+         */
+        parse : function (query, sep, eq) {
+            var params = {},
+                queryParams,
+                tmp, value, key,
+                i, size;
+
+            arguments.length || (query = location.search.substr(1));
+
+            if (!query) {
+                return params;
+            }
+
+            sep || (sep = '&');
+            eq || (eq = '=');
+
+            queryParams = query.split(sep);
+
+            for (i = 0, size = queryParams.length; i < size; ++i) {
+                tmp = queryParams[i].split(eq);
+                value = typeof tmp[1] !== 'undefined' ? decodeURIComponent(tmp[1].replace(/\+/g, '%20')) : '';
+                key = decodeURIComponent(tmp[0]);
+
+                if (params.hasOwnProperty(key)) {
+                    if (!Array.isArray(params[key])) {
+                        params[key] = [params[key], value];
+                    } else {
+                        params[key].push(value);
+                    }
+                } else {
+                    params[key] = value;
+                }
+            }
+
+            return params;
+        },
+
+        /**
+         * Метод обратный parse
+         * Аналог http://nodejs.org/api/querystring.html#querystring_querystring_stringify_obj_sep_eq
+         * @static
+         * @param {Object} params
+         * @param {String} [sep='&']
+         * @param {String} [eq='=']
+         * @return {String}
+         */
+        stringify : function (params, sep, eq) {
+            var query = '',
+                value,
+                typeOf,
+                tmpArray,
+                i, size, key;
+
+            if (!params) {
+                return query;
+            }
+
+            sep || (sep = '&');
+            eq || (eq = '=');
+
+            for (key in params) {
+                if (params.hasOwnProperty(key)) {
+                    tmpArray = [].concat(params[key]);
+                    for (i = 0, size = tmpArray.length; i < size; ++i) {
+                        typeOf = typeof tmpArray[i];
+
+                        if (typeOf === 'object' || typeOf === 'undefined') {
+                            value = '';
+                        } else {
+                            value = encodeURIComponent(tmpArray[i]);
+                        }
+
+                        query += sep + encodeURIComponent(key) + eq + value;
+                    }
+                }
+            }
+
+            return query.substr(sep.length);
+        }
+
     };
+
+    var escape = (function() {
+        var SPECIAL_CHARS = [ '/', '.', '*', '+', '?', '|', '(', ')', '[', ']', '{', '}', '\\' ],
+            SPECIAL_CHARS_REGEXP = new RegExp('(\\' + SPECIAL_CHARS.join('|\\') + ')', 'g');
+
+        return function(text) {
+            return text.replace(SPECIAL_CHARS_REGEXP, '\\$1');
+        };
+    })();
+
+    var HTTP_METHODS = [ 'GET', 'POST', 'DELETE', 'PUT' ];
+    var HTTP_METHODS_REGEXP = new RegExp('^(' + HTTP_METHODS.join('|') + ')$');
+
+    var PARAM_OPENED_CHAR = '<';
+    var PARAM_CLOSED_CHAR = '>';
+
+    var GROUP_OPENED_CHAR = '(';
+    var GROUP_CLOSED_CHAR = ')';
+
+    var PARAM_NAME_REGEXP_SOURCE = '[a-zA-Z_][\\w\\-]*';
+    var PARAM_VALUE_REGEXP_SOURCE = '[\\w\\-]+';
+
+    var PARSE_PARAMS_REGEXP =
+        new RegExp(
+            '(' +
+                escape(PARAM_OPENED_CHAR) + PARAM_NAME_REGEXP_SOURCE +
+                escape(PARAM_CLOSED_CHAR) + '|' +
+                '[^' + escape(PARAM_OPENED_CHAR) + escape(PARAM_CLOSED_CHAR) + ']+' + '|' +
+                escape(PARAM_OPENED_CHAR) + '|' +
+                escape(PARAM_CLOSED_CHAR) +
+                ')',
+            'g');
 
     /**
      * Класс роут
@@ -20,7 +148,7 @@
     function Route(method, name, pattern, conditions, defaults) {
         method = method.toUpperCase();
 
-        if ( ! Route.HTTP_METHODS_REGEXP.test(method)) {
+        if ( ! HTTP_METHODS_REGEXP.test(method)) {
             throw 'Invalid http method "' + method + '"';
         }
 
@@ -33,9 +161,9 @@
         }
 
         /* Добавим query_string */
-        pattern += Route.GROUP_OPENED_CHAR +
-            '?' + Route.PARAM_OPENED_CHARS + 'query_string' + Route.PARAM_CLOSED_CHARS +
-            Route.GROUP_CLOSED_CHAR;
+        pattern += GROUP_OPENED_CHAR +
+            '?' + PARAM_OPENED_CHAR + 'query_string' + PARAM_CLOSED_CHAR +
+            GROUP_CLOSED_CHAR;
         conditions || (conditions = {});
         conditions.query_string = '.*';
         /* /Добавим query_string */
@@ -52,40 +180,6 @@
             .buildParseRegExp()
             .buildBuildFn();
     }
-
-    Route.querystring = require('querystring');
-
-    Route.escape = (function() {
-        var SPECIAL_CHARS = [ '/', '.', '*', '+', '?', '|', '(', ')', '[', ']', '{', '}', '\\' ],
-            SPECIAL_CHARS_REGEXP = new RegExp('(\\' + SPECIAL_CHARS.join('|\\') + ')', 'g');
-
-        return function(text) {
-            return text.replace(SPECIAL_CHARS_REGEXP, '\\$1');
-        };
-    })();
-
-    Route.HTTP_METHODS = [ 'GET', 'POST', 'DELETE', 'PUT' ];
-    Route.HTTP_METHODS_REGEXP = new RegExp('^(' + Route.HTTP_METHODS.join('|') + ')$');
-
-    Route.PARAM_OPENED_CHARS = '<';      // @todo  chars => char
-    Route.PARAM_CLOSED_CHARS = '>';
-
-    Route.GROUP_OPENED_CHAR = '(';
-    Route.GROUP_CLOSED_CHAR = ')';
-
-    Route.PARAM_NAME_REGEXP_SOURCE = '[a-zA-Z_][\\w\\-]*';
-    Route.PARAM_VALUE_REGEXP_SOURCE = '[\\w\\-]+';
-
-    Route.PARSE_PARAMS_REGEXP =
-        new RegExp(
-            '(' +
-                Route.escape(Route.PARAM_OPENED_CHARS) + Route.PARAM_NAME_REGEXP_SOURCE +
-                Route.escape(Route.PARAM_CLOSED_CHARS) + '|' +
-                '[^' + Route.escape(Route.PARAM_OPENED_CHARS) + Route.escape(Route.PARAM_CLOSED_CHARS) + ']+' + '|' +
-                Route.escape(Route.PARAM_OPENED_CHARS) + '|' +
-                Route.escape(Route.PARAM_CLOSED_CHARS) +
-                ')',
-            'g');
 
     /**
      * Парсит паттерн, дробит его на составляющие
@@ -105,7 +199,7 @@
             while (i < length) {
                 character = pattern.charAt(i++);
 
-                if (character === Route.GROUP_OPENED_CHAR) {
+                if (character === GROUP_OPENED_CHAR) {
                     if (isFindingClosed) {
                         ++countOpened;
                         part += character;
@@ -115,7 +209,7 @@
                         countOpened = 0;
                         isFindingClosed = true;
                     }
-                } else if (character === Route.GROUP_CLOSED_CHAR) {
+                } else if (character === GROUP_CLOSED_CHAR) {
                     if (isFindingClosed) {
                         if (countOpened === 0) {
                             part = {
@@ -152,7 +246,7 @@
         }
 
         function parseParams(pattern, parts) {
-            var matches = pattern.match(Route.PARSE_PARAMS_REGEXP),
+            var matches = pattern.match(PARSE_PARAMS_REGEXP),
                 i, size,
                 part;
 
@@ -160,13 +254,10 @@
                 for (i = 0, size = matches.length; i < size; ++i) {
                     part = matches[i];
 
-                    if (part.indexOf(Route.PARAM_OPENED_CHARS) === 0 &&
-                        part.lastIndexOf(Route.PARAM_CLOSED_CHARS) === part.length - Route.PARAM_CLOSED_CHARS.length) {
+                    if (part.charAt(0) === PARAM_OPENED_CHAR && part.charAt(part.length - 1) === PARAM_CLOSED_CHAR) {
                         parts.push({
                             what : 'param',
-                            name : part.substr(
-                                Route.PARAM_OPENED_CHARS.length,
-                                part.length - Route.PARAM_CLOSED_CHARS.length - 1)
+                            name : part.substr(1, part.length - 2)
                         });
                     } else {
                         parts.push(part);
@@ -196,7 +287,7 @@
                 part = parts[i];
 
                 if (typeof part === 'string') {
-                    ret += Route.escape(part);
+                    ret += escape(part);
                 } else if (part && part.what === 'param') {
                     route._paramsMap.push(part.name);
                     ret += '(' + buildParamValueRegExpSource(part.name) + ')';
@@ -219,7 +310,7 @@
                     ret = condition + '';
                 }
             } else {
-                ret =  Route.PARAM_VALUE_REGEXP_SOURCE;
+                ret =  PARAM_VALUE_REGEXP_SOURCE;
             }
 
             return ret;
@@ -249,12 +340,12 @@
                 part = parts[i];
 
                 if (typeof part === 'string') {
-                    ret += '+"' + Route.escape(part) + '"' ;
+                    ret += '+"' + escape(part) + '"' ;
                 } else if (part && part.what === 'param') {
-                    ret += '+(h.call(p,"' + Route.escape(part.name) + '")?' +
-                        'p["' + Route.escape(part.name) + '"]:' +
+                    ret += '+(h.call(p,"' + escape(part.name) + '")?' +
+                        'p["' + escape(part.name) + '"]:' +
                         (route._defaults && hasOwnProp.call(route._defaults, part.name) ?
-                            '"' + Route.escape(route._defaults[part.name]) +  '"' :
+                            '"' + escape(route._defaults[part.name]) +  '"' :
                             '""') +
                         ')';
                 } else if (part && part.what === 'optional') {
@@ -263,10 +354,10 @@
                     for (j = 0, sizeJ = part.dependOnParams.length; j < sizeJ; ++j) {
                         name = part.dependOnParams[j];
 
-                        ret += '||(h.call(p,"' + Route.escape(name) + '")' +
+                        ret += '||(h.call(p,"' + escape(name) + '")' +
                             (route._defaults && hasOwnProp.call(route._defaults, name) ?
-                                '&&p["' + Route.escape(name) + '"]!=="' +
-                                    Route.escape(route._defaults[name]) + '"' :
+                                '&&p["' + escape(name) + '"]!=="' +
+                                    escape(route._defaults[name]) + '"' :
                                 '') +
                             ')';
                     }
@@ -317,7 +408,7 @@
                     }
                 }
 
-                queryParams = Route.querystring.parse(ret.query_string);
+                queryParams = querystring.parse(ret.query_string);
                 for (key in queryParams) {
                     if (hasOwnProp.call(queryParams, key) && ! hasOwnProp.call(ret, key)) {
                         ret[key] = queryParams[key];
@@ -351,7 +442,7 @@
             }
         }
 
-        queryString = Route.querystring.stringify(queryParams);
+        queryString = querystring.stringify(queryParams);
         queryString && (newParams.query_string = queryString);
 
         return this._buildFn(newParams);
