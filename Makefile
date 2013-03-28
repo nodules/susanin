@@ -7,10 +7,10 @@ UGLIFYJS := $(BIN_PATH)uglifyjs
 test: jshint
 
 jshint: $(JSHINT)
-	$(JSHINT) crossroads.js
+	$(JSHINT) jsrouter.js
 
 minify: $(UGLIFYJS)
-	$(UGLIFYJS) crossroads.js > crossroads.min.js
+	$(UGLIFYJS) jsrouter.js > jsrouter.min.js
 
 $(JSHINT) $(UGLIFYJS):
 	npm install

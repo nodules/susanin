@@ -2,4 +2,4 @@
 
 make test
 make minify
-git add crossroads.min.js
+git add jsrouter.min.js
