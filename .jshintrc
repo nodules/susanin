@@ -167,7 +167,7 @@
     "dojo" : false,
 
     // This option defines globals exposed by the jQuery JavaScript library.
-    "jquery" : true,
+    "jquery" : false,
 
     // This option defines globals exposed by the MooTools JavaScript framework.
     "mootools" : false,
@@ -178,7 +178,7 @@
     // This option defines non-standard but widely adopted globals such as escape and un escape.
     "nonstandard" : false,
 
-    // This option defines globals exposed by the Prototype JavaScript framework.
+    // This option defines globals exposed by the Prototype JavaScript framework.js
     "prototypejs" : false,
 
     // This option defines globals available when your code is running inside of the Rhino runtime environment.
