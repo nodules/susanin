@@ -147,6 +147,10 @@
      *  @param {Object} [options.defaults] умалчиваемые значения параметров
      */
     function Route(options) {
+        if ( ! (this instanceof Route)) {
+            return new Route(options);
+        }
+
         if ( ! options || typeof options !== 'object') {
             throw new Error('You must specify options');
         }
@@ -395,7 +399,11 @@
             key,
             queryParams;
 
-        method = method.toUpperCase();
+        if (method) {
+            method = method.toUpperCase();
+        } else {
+            method = 'GET';
+        }
 
         if (this._method === method) {
             matches = path.match(this._parseRegExp);
@@ -482,7 +490,7 @@
             this._paramsMap,
             this._parseRegExpSource,
             this._buildFnSource,
-            this._data && this._data.controller
+            this._data && this._data.controller // @todo
         ];
     };
 
@@ -491,6 +499,10 @@
      * @constructor
      */
     function Router() {
+        if ( ! (this instanceof Router)) {
+            return new Router();
+        }
+
         this._routes = [];
         this._routesByName = {};
     }
@@ -556,6 +568,7 @@
         return ret;
     };
 
+    Router.Route = Route;
 
     if (typeof module !== 'undefined' && typeof module.exports === 'object') {
         module.exports = Router;

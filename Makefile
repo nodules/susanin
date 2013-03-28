@@ -1,10 +1,12 @@
 BIN_PATH := ./node_modules/.bin/
 JSHINT := $(BIN_PATH)jshint
 UGLIFYJS := $(BIN_PATH)uglifyjs
+NODEUNIT := $(BIN_PATH)nodeunit
 
 .PHONY: jshint test minify hook
 
-test: jshint
+test: jshint $(NODEUNIT)
+	$(NODEUNIT) tests
 
 jshint: $(JSHINT)
 	$(JSHINT) susanin.js
@@ -12,7 +14,7 @@ jshint: $(JSHINT)
 minify: $(UGLIFYJS)
 	$(UGLIFYJS) susanin.js > susanin.min.js
 
-$(JSHINT) $(UGLIFYJS):
+$(JSHINT) $(UGLIFYJS) $(NODEUNIT):
 	npm install
 
 hook: .git/hooks/pre-commit
