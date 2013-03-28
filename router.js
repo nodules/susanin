@@ -139,41 +139,48 @@
     /**
      * Класс роут
      * @constructor
-     * @param {String} method http метод
-     * @param {String} name имя роута
-     * @param {String} pattern паттерн соответствия
-     * @param {Object} [conditions] условия, накладываемые на параметры
-     * @param {Object} [defaults] умалчиваемые значения параметров
+     * @param {Object} options
+     *  @param {String} options.name имя роута
+     *  @param {String} options.pattern паттерн соответствия
+     *  @param {String} [options.method] http метод
+     *  @param {Object} [options.conditions] условия, накладываемые на параметры
+     *  @param {Object} [options.defaults] умалчиваемые значения параметров
      */
-    function Route(method, name, pattern, conditions, defaults) {
-        method = method.toUpperCase();
-
-        if ( ! HTTP_METHODS_REGEXP.test(method)) {
-            throw 'Invalid http method "' + method + '"';
+    function Route(options) {
+        if ( ! options || typeof options !== 'object') {
+            throw new Error('You must specify options');
         }
 
-        if (typeof name !== 'string') {
-            throw 'Argument 2 (name) must be string';
+        if (typeof options.name !== 'string') {
+            throw new Error('You must specify name of route');
+        }
+        this._name = options.name;
+
+        if (typeof options.pattern !== 'string') {
+            throw new Error('You must specify pattern of route');
+        }
+        this._pattern = options.pattern;
+
+        if (typeof options.method === 'string') {
+            this._method = options.method.toUpperCase();
+
+            if ( ! HTTP_METHODS_REGEXP.test(this._method)) {
+                throw 'Invalid http method "' + this._method + '"';
+            }
+        } else {
+            this._method = 'GET';
         }
 
-        if (typeof pattern !== 'string') {
-            throw 'Argument 3 (pattern) must be string';
-        }
+        this._conditions = options.conditions && typeof options.conditions === 'object' ? options.conditions : {};
+        this._defaults = options.defaults && typeof options.defaults === 'object' ? options.defaults : {};
+        this._data = null;
 
         /* Добавим query_string */
-        pattern += GROUP_OPENED_CHAR +
+        this._pattern += GROUP_OPENED_CHAR +
             '?' + PARAM_OPENED_CHAR + 'query_string' + PARAM_CLOSED_CHAR +
             GROUP_CLOSED_CHAR;
-        conditions || (conditions = {});
-        conditions.query_string = '.*';
+        this._conditions.query_string = '.*';
         /* /Добавим query_string */
-
-        this._method = method;
-        this._name = name;
-        this._pattern = pattern;
-        this._conditions = conditions;
-        this._defaults = defaults || null;
-        this._data = null;
 
         this
             .parsePattern()
@@ -464,6 +471,10 @@
         return this;
     };
 
+    Route.prototype.getName = function() {
+        return this._name;
+    };
+
     Route.prototype.bundle = function() {
         return [
             this._name,
@@ -486,19 +497,15 @@
 
     /**
      * Добавляет роут
-     * @param {String} method http метод
-     * @param {String} name имя роута
-     * @param {String} pattern паттерн соответствия
-     * @param {Object} [conditions] условия, накладываемые на параметры
-     * @param {Object} [defaults] умалчиваемые значения параметров
+     * @param {Object} opts
      */
-    Router.prototype.addRoute = function(method, name, pattern, conditions, defaults) {      // @todo => opts
+    Router.prototype.addRoute = function(opts) {      // @todo => opts
         var route;
 
-        route = new Route(method, name, pattern, conditions, defaults);
+        route = new Route(opts);
 
         this._routes.push(route);
-        this._routesByName[name] = route;
+        this._routesByName[route.getName()] = route;
 
         return route;
     };
@@ -548,6 +555,8 @@
 
         return ret;
     };
+
+
 
     if (typeof module !== 'undefined' && typeof module.exports === 'object') {
         module.exports = Router;
