@@ -2,77 +2,10 @@
 
     var hasOwnProp = Object.prototype.hasOwnProperty;
 
-    /**
-     * @constructor
-     */
-    function Router() {
-        this._routes = null;
-        this._routesByName = null;
-    }
+    var toString = Object.prototype.toString;
 
-    /**
-     * Добавляет роут
-     * @param {String} method http метод
-     * @param {String} name имя роута
-     * @param {String} pattern паттерн соответствия
-     * @param {Object} [conditions] условия, накладываемые на параметры
-     * @param {Object} [defaults] умалчиваемые значения параметров
-     */
-    Router.prototype.addRoute = function(method, name, pattern, conditions, defaults) {
-        var route;
-
-        route = new Route(method, name, pattern, conditions, defaults);
-
-        this._routes || (this._routes = []);
-        this._routes.push(route);
-
-        this._routesByName || (this._routesByName = {});
-        this._routesByName[name] = route;
-
-        return route;
-    };
-
-    /**
-     * Находит первый подходящий роут по пути и методу,
-     * возвращает массив с привязанными данными и распарсенными параметрами либо null, если ни один из роутов не подошёл
-     * @return {Array}
-     */
-    Router.prototype.find = function() {
-        var ret = null,
-            parsed,
-            i, size,
-            routes = this._routes;
-
-        if (routes) {
-            for (i = 0, size = routes.length; i < size; ++i) {
-                parsed = routes[i].parse.apply(routes[i], arguments);
-                if (parsed !== null) {
-                    ret = [ routes[i], parsed ];
-                    break;
-                }
-            }
-        }
-
-        return ret;
-    };
-
-    /**
-     * Возвращает роут по имени
-     * @param {String} name
-     * @return {Route}
-     */
-    Router.prototype.getRouteByName = function(name) {
-        return (this._routesByName && this._routesByName[name]) || null;
-    };
-
-    /**
-     * Формирует бандл для прокидывания на клиент
-     * @return {Array}
-     */
-    Router.prototype.bundle = function() {
-        return this._routes && this._routes.map(function(route) {   // @todo map
-            return route.bundle();
-        });
+    var isArray = function(subject) {
+        return toString.call(subject) === '[object Array]';
     };
 
     /**
@@ -134,7 +67,7 @@
     Route.HTTP_METHODS = [ 'GET', 'POST', 'DELETE', 'PUT' ];
     Route.HTTP_METHODS_REGEXP = new RegExp('^(' + Route.HTTP_METHODS.join('|') + ')$');
 
-    Route.PARAM_OPENED_CHARS = '<';
+    Route.PARAM_OPENED_CHARS = '<';      // @todo  chars => char
     Route.PARAM_CLOSED_CHARS = '>';
 
     Route.GROUP_OPENED_CHAR = '(';
@@ -219,10 +152,14 @@
         }
 
         function parseParams(pattern, parts) {
-            var matches = pattern.match(Route.PARSE_PARAMS_REGEXP);
+            var matches = pattern.match(Route.PARSE_PARAMS_REGEXP),
+                i, size,
+                part;
 
             if (matches) {
-                matches.forEach(function(part) {
+                for (i = 0, size = matches.length; i < size; ++i) {
+                    part = matches[i];
+
                     if (part.indexOf(Route.PARAM_OPENED_CHARS) === 0 &&
                         part.lastIndexOf(Route.PARAM_CLOSED_CHARS) === part.length - Route.PARAM_CLOSED_CHARS.length) {
                         parts.push({
@@ -234,7 +171,7 @@
                     } else {
                         parts.push(part);
                     }
-                });
+                }
             }
         }
 
@@ -251,9 +188,13 @@
         var route = this;
 
         function build(parts) {
-            var ret = '';
+            var ret = '',
+                i, size,
+                part;
 
-            parts.forEach(function(part) {
+            for (i = 0, size = parts.length; i < size; ++i) {
+                part = parts[i];
+
                 if (typeof part === 'string') {
                     ret += Route.escape(part);
                 } else if (part && part.what === 'param') {
@@ -262,7 +203,7 @@
                 } else if (part && part.what === 'optional') {
                     ret += '(?:' + build(part.parts) + ')?';
                 }
-            });
+            }
 
             return ret;
         }
@@ -272,7 +213,7 @@
                 condition = route._conditions && route._conditions[paramName];
 
             if (condition) {
-                if (Array.isArray(condition)) {
+                if (isArray(condition)) {
                     ret = '(?:' + condition.join('|') + ')';
                 } else {
                     ret = condition + '';
@@ -300,9 +241,13 @@
         var route = this;
 
         function build(parts) {
-            var ret = '""';
+            var ret = '""',
+                i, sizeI, j, sizeJ,
+                part, name;
 
-            parts.forEach(function(part) {
+            for (i = 0, sizeI = parts.length; i < sizeI; ++i) {
+                part = parts[i];
+
                 if (typeof part === 'string') {
                     ret += '+"' + Route.escape(part) + '"' ;
                 } else if (part && part.what === 'param') {
@@ -314,17 +259,21 @@
                         ')';
                 } else if (part && part.what === 'optional') {
                     ret += '+((false';
-                    part.dependOnParams.forEach(function(name) {
+
+                    for (j = 0, sizeJ = part.dependOnParams.length; j < sizeJ; ++j) {
+                        name = part.dependOnParams[j];
+
                         ret += '||(h.call(p,"' + Route.escape(name) + '")' +
                             (route._defaults && hasOwnProp.call(route._defaults, name) ?
                                 '&&p["' + Route.escape(name) + '"]!=="' +
                                     Route.escape(route._defaults[name]) + '"' :
                                 '') +
                             ')';
-                    });
+                    }
+
                     ret += ')?(' + build(part.parts) + '):"")';
                 }
-            });
+            }
 
             return ret;
         }
@@ -435,6 +384,84 @@
         ];
     };
 
-    global.Router = Router;
+
+    /**
+     * @constructor
+     */
+    function Router() {
+        this._routes = [];
+        this._routesByName = {};
+    }
+
+    /**
+     * Добавляет роут
+     * @param {String} method http метод
+     * @param {String} name имя роута
+     * @param {String} pattern паттерн соответствия
+     * @param {Object} [conditions] условия, накладываемые на параметры
+     * @param {Object} [defaults] умалчиваемые значения параметров
+     */
+    Router.prototype.addRoute = function(method, name, pattern, conditions, defaults) {      // @todo => opts
+        var route;
+
+        route = new Route(method, name, pattern, conditions, defaults);
+
+        this._routes.push(route);
+        this._routesByName[name] = route;
+
+        return route;
+    };
+
+    /**
+     * Находит первый подходящий роут по пути и методу,
+     * возвращает массив с привязанными данными и распарсенными параметрами либо null, если ни один из роутов не подошёл
+     * @return {Array}
+     */
+    Router.prototype.find = function() {
+        var parsed,
+            i, size,
+            routes = this._routes;
+
+        for (i = 0, size = routes.length; i < size; ++i) {
+            parsed = routes[i].parse.apply(routes[i], arguments);
+            if (parsed !== null) {
+                return [ routes[i], parsed ];
+            }
+        }
+
+        return null;
+    };
+
+    /**
+     * Возвращает роут по имени
+     * @param {String} name
+     * @return {Route}
+     */
+    Router.prototype.getRouteByName = function(name) {
+        return this._routesByName[name] || null;
+    };
+
+    /**
+     * Формирует бандл для прокидывания на клиент
+     * @return {Array}
+     */
+    Router.prototype.bundle = function() {
+        var ret = null,
+            i, size,
+            routes = this._routes;
+
+        for (i = 0, size = routes.length; i < size; ++i) {
+            ret || (ret = []);
+            ret.push(routes[i].bundle());
+        }
+
+        return ret;
+    };
+
+    if (typeof module !== 'undefined' && typeof module.exports === 'object') {
+        module.exports = Router;
+    } else {
+        global.Router = Router;
+    }
 
 })(this);
