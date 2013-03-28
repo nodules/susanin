@@ -2,4 +2,4 @@
 
 make test
 make minify
-git add jsrouter.min.js
+git add susanin.min.js

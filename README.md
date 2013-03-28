@@ -1,1 +1,1 @@
-[![Build Status](https://secure.travis-ci.org/ruslankerimov/jsrouter.png)](http://travis-ci.org/ruslankerimov/jsrouter)
+[![Build Status](https://secure.travis-ci.org/ruslankerimov/susanin.png)](http://travis-ci.org/ruslankerimov/susanin)

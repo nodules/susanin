@@ -7,10 +7,10 @@ UGLIFYJS := $(BIN_PATH)uglifyjs
 test: jshint
 
 jshint: $(JSHINT)
-	$(JSHINT) jsrouter.js
+	$(JSHINT) susanin.js
 
 minify: $(UGLIFYJS)
-	$(UGLIFYJS) jsrouter.js > jsrouter.min.js
+	$(UGLIFYJS) susanin.js > susanin.min.js
 
 $(JSHINT) $(UGLIFYJS):
 	npm install
