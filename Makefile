@@ -1,4 +1,3 @@
-NAME := router
 BIN_PATH := ./node_modules/.bin/
 JSHINT := $(BIN_PATH)jshint
 UGLIFYJS := $(BIN_PATH)uglifyjs
@@ -8,10 +7,10 @@ UGLIFYJS := $(BIN_PATH)uglifyjs
 test: jshint
 
 jshint: $(JSHINT)
-	$(JSHINT) $(NAME).js
+	$(JSHINT) crossroads.js
 
 minify: $(UGLIFYJS)
-	$(UGLIFYJS) $(NAME).js > $(NAME).min.js
+	$(UGLIFYJS) crossroads.js > crossroads.min.js
 
 $(JSHINT) $(UGLIFYJS):
 	npm install

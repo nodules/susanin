@@ -490,7 +490,7 @@
     /**
      * @constructor
      */
-    function Router() {
+    function Crossroads() {
         this._routes = [];
         this._routesByName = {};
     }
@@ -499,7 +499,7 @@
      * Добавляет роут
      * @param {Object} opts
      */
-    Router.prototype.addRoute = function(opts) {      // @todo => opts
+    Crossroads.prototype.addRoute = function(opts) {      // @todo => opts
         var route;
 
         route = new Route(opts);
@@ -515,7 +515,7 @@
      * возвращает массив с привязанными данными и распарсенными параметрами либо null, если ни один из роутов не подошёл
      * @return {Array}
      */
-    Router.prototype.find = function() {
+    Crossroads.prototype.find = function() {
         var parsed,
             i, size,
             routes = this._routes;
@@ -535,7 +535,7 @@
      * @param {String} name
      * @return {Route}
      */
-    Router.prototype.getRouteByName = function(name) {
+    Crossroads.prototype.getRouteByName = function(name) {
         return this._routesByName[name] || null;
     };
 
@@ -543,7 +543,7 @@
      * Формирует бандл для прокидывания на клиент
      * @return {Array}
      */
-    Router.prototype.bundle = function() {
+    Crossroads.prototype.bundle = function() {
         var ret = null,
             i, size,
             routes = this._routes;
@@ -557,11 +557,10 @@
     };
 
 
-
     if (typeof module !== 'undefined' && typeof module.exports === 'object') {
-        module.exports = Router;
+        module.exports = Crossroads;
     } else {
-        global.Router = Router;
+        global.Crossroads = Crossroads;
     }
 
 })(this);
