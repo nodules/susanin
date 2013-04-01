@@ -11,6 +11,8 @@ module.exports = {
         test.strictEqual(route.build({ foo : undefined }), '/opa');
         test.strictEqual(route.build({ foo : null }), '/opa');
         test.strictEqual(route.build({ foo : [ 'bar1', 'bar2' ] }), '/opa?foo=bar1&foo=bar2');
+        test.strictEqual(route.build({ '' : [ 'bar1', 'bar2' ] }), '/opa?=bar1&=bar2');
+        test.strictEqual(route.build({ '' : '' }), '/opa?=');
         test.strictEqual(route.build({ foo1 : [ 'bar1', 'bar2' ], foo2 : [ 'bar3' ] }),
             '/opa?foo1=bar1&foo1=bar2&foo2=bar3');
 

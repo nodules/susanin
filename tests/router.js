@@ -29,6 +29,18 @@ module.exports = {
     '"addRoute" must return instance of Router.Route' : function(test) {
         test.ok(Router().addRoute({ name : 'first', pattern : '/opa' }) instanceof Router.Route);
         test.done();
+    },
+
+    '"getRouteByName" must return right instance of "Route"' : function(test) {
+        var router = Router(),
+            routeFoo = router.addRoute({ name : 'foo', pattern : '/foo' }),
+            routeBar = router.addRoute({ name : 'bar', pattern : '/bar' });
+
+        test.strictEqual(router.getRouteByName('bar'), routeBar);
+        test.strictEqual(router.getRouteByName('foo'), routeFoo);
+        test.strictEqual(router.getRouteByName('opa'), null);
+
+        test.done();
     }
 
 };

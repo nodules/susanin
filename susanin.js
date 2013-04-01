@@ -188,8 +188,8 @@
 
         this._parts = this._parsePattern(this._pattern);
         this
-            .buildParseRegExp()
-            .buildBuildFn();
+            ._buildParseRegExp()
+            ._buildBuildFn();
     }
 
     /**
@@ -274,13 +274,13 @@
                 }
             }
         }
-    },
+    };
 
     /**
      * Строит регэксп для проверки
      * @return {Route}
      */
-    Route.prototype.buildParseRegExp = function() {
+    Route.prototype._buildParseRegExp = function() {
         var route = this;
 
         function build(parts) {
@@ -332,7 +332,7 @@
      * Строит функцию для составления пути
      * @return {Route}
      */
-    Route.prototype.buildBuildFn = function() {
+    Route.prototype._buildBuildFn = function() {
         /*jshint evil:true */
         var route = this;
 
