@@ -7,7 +7,7 @@
         "url" : "git://github.com/ruslankerimov/susanin.git"
     },
     "scripts" : {
-        "test" : "make test"
+        "test" : "make tests"
     },
     "dependencies" : {},
     "devDependencies" : {

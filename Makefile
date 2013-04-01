@@ -3,9 +3,10 @@ JSHINT := $(BIN_PATH)jshint
 UGLIFYJS := $(BIN_PATH)uglifyjs
 NODEUNIT := $(BIN_PATH)nodeunit
 
-.PHONY: jshint test minify hook
+all: tests
+tests: jshint unittests
 
-test: jshint $(NODEUNIT)
+unittests: $(NODEUNIT) minify
 	$(NODEUNIT) tests
 
 jshint: $(JSHINT)
@@ -20,3 +21,5 @@ $(JSHINT) $(UGLIFYJS) $(NODEUNIT):
 hook: .git/hooks/pre-commit
 .git/hooks/pre-commit: pre-commit
 	cp $< $@
+
+.PHONY: jshint test minify hook all unittests

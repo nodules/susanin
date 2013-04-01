@@ -186,8 +186,8 @@
         this._conditions.query_string = '.*';
         /* /Добавим query_string */
 
+        this._parts = this._parsePattern(this._pattern);
         this
-            .parsePattern()
             .buildParseRegExp()
             .buildBuildFn();
     }
@@ -196,91 +196,85 @@
      * Парсит паттерн, дробит его на составляющие
      * @return {Route}
      */
-    Route.prototype.parsePattern = function() {
-        /*jshint maxdepth:10*/
-        function parseBrackets(pattern) {
-            var parts = [],
-                part = '',
-                character,
-                i = 0, j, size,
-                countOpened = 0,
-                isFindingClosed = false,
-                length = pattern.length;
+    Route.prototype._parsePattern = function(pattern) {
+        var parts = [],
+            part = '',
+            character,
+            i = 0, j, size,
+            countOpened = 0,
+            isFindingClosed = false,
+            length = pattern.length;
 
-            while (i < length) {
-                character = pattern.charAt(i++);
+        while (i < length) {
+            character = pattern.charAt(i++);
 
-                if (character === GROUP_OPENED_CHAR) {
-                    if (isFindingClosed) {
-                        ++countOpened;
-                        part += character;
-                    } else {
-                        parseParams(part, parts);
-                        part = '';
-                        countOpened = 0;
-                        isFindingClosed = true;
-                    }
-                } else if (character === GROUP_CLOSED_CHAR) {
-                    if (isFindingClosed) {
-                        if (countOpened === 0) {
-                            part = {
-                                what : 'optional',
-                                dependOnParams : [],
-                                parts : parseBrackets(part)
-                            };
+            if (character === GROUP_OPENED_CHAR) {
+                if (isFindingClosed) {
+                    ++countOpened;
+                    part += character;
+                } else {
+                    this._parseParams(part, parts);
+                    part = '';
+                    countOpened = 0;
+                    isFindingClosed = true;
+                }
+            } else if (character === GROUP_CLOSED_CHAR) {
+                /*jshint maxdepth:10*/
+                if (isFindingClosed) {
+                    if (countOpened === 0) {
+                        part = {
+                            what : 'optional',
+                            dependOnParams : [],
+                            parts : this._parsePattern(part)
+                        };
 
-                            parts.push(part);
+                        parts.push(part);
 
-                            for (j = 0, size = part.parts.length; j < size; ++j) {
-                                if (part.parts[j] && part.parts[j].what === 'param') {
-                                    part.dependOnParams.push(part.parts[j].name);
-                                }
+                        for (j = 0, size = part.parts.length; j < size; ++j) {
+                            if (part.parts[j] && part.parts[j].what === 'param') {
+                                part.dependOnParams.push(part.parts[j].name);
                             }
-
-                            part = '';
-                            isFindingClosed = false;
-                        } else {
-                            --countOpened;
-                            part += character;
                         }
+
+                        part = '';
+                        isFindingClosed = false;
                     } else {
+                        --countOpened;
                         part += character;
                     }
                 } else {
                     part += character;
                 }
+            } else {
+                part += character;
             }
-
-            parseParams(part, parts);
-
-            return parts;
         }
 
-        function parseParams(pattern, parts) {
-            var matches = pattern.match(PARSE_PARAMS_REGEXP),
-                i, size,
-                part;
+        this._parseParams(part, parts);
 
-            if (matches) {
-                for (i = 0, size = matches.length; i < size; ++i) {
-                    part = matches[i];
+        return parts;
+    },
 
-                    if (part.charAt(0) === PARAM_OPENED_CHAR && part.charAt(part.length - 1) === PARAM_CLOSED_CHAR) {
-                        parts.push({
-                            what : 'param',
-                            name : part.substr(1, part.length - 2)
-                        });
-                    } else {
-                        parts.push(part);
-                    }
+    Route.prototype._parseParams = function(pattern, parts) {
+        var matches = pattern.match(PARSE_PARAMS_REGEXP),
+            i, size,
+            part;
+
+        if (matches) {
+            for (i = 0, size = matches.length; i < size; ++i) {
+                part = matches[i];
+
+                if (part.charAt(0) === PARAM_OPENED_CHAR && part.charAt(part.length - 1) === PARAM_CLOSED_CHAR) {
+                    parts.push({
+                        what : 'param',
+                        name : part.substr(1, part.length - 2)
+                    });
+                } else {
+                    parts.push(part);
                 }
             }
         }
-
-        this._parts = parseBrackets(this._pattern);
-
-        return this;
-    };
+    },
 
     /**
      * Строит регэксп для проверки
@@ -448,8 +442,12 @@
             key;
 
         for (key in params) {
-            if (hasOwnProp.call(params, key)) {
-                if (this._paramsMap.indexOf(key) !== -1) {
+            if (
+                hasOwnProp.call(params, key) &&
+                params[key] !== null &&
+                typeof params[key] !== 'undefined'
+            ) {
+                if (this._paramsMap.indexOf(key) !== -1) { // @todo indexOf
                     newParams[key] = params[key];
                 } else {
                     queryParams[key] = params[key];

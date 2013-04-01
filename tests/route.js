@@ -65,10 +65,10 @@ module.exports = {
         test.done();
     },
 
-    'route.getName() must return name of route' : function(test) {
+    'route.getName() must return the name of the route' : function(test) {
         var route = Route({ name : 'opa', pattern : '/opa' });
 
-        test.strictEqual(route.getName(), 'opa1');
+        test.strictEqual(route.getName(), 'opa');
         test.done();
     }
 
