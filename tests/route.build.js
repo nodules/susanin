@@ -36,6 +36,20 @@ module.exports = {
         test.done();
     },
 
+    '/opa/<param' : function(test) {
+        var route = Route({
+            name : 'opa',
+            pattern : '/opa/<param'
+        });
+
+        test.strictEqual(route.build(), '/opa/<param');
+        test.strictEqual(route.build({ param : 'bar' }), '/opa/<param?param=bar');
+        test.strictEqual(route.build({ param : 'bar', foo1 : [ 'bar1', 'bar2' ], foo2 : [ 'bar3' ] }),
+            '/opa/<param?param=bar&foo1=bar1&foo1=bar2&foo2=bar3');
+
+        test.done();
+    },
+
     '/opa/<param> with defaults' : function(test) {
         var route = Route({
                 name : 'opa',
@@ -116,6 +130,36 @@ module.exports = {
         test.strictEqual(route.build({ param1 : 'bar1', param2 : 'bar2' }), '/opa/opapa/bar1/bar2');
         test.strictEqual(route.build({ param1 : 'bar', foo1 : [ 'bar1', 'bar2' ], foo2 : [ 'bar3' ] }),
             '/opa/opapa/bar?foo1=bar1&foo1=bar2&foo2=bar3');
+
+        test.done();
+    },
+
+    'Unsupported characters in params name' : function(test) {
+        [ '+', '.', ',', ' ' ].forEach(function(character) {
+            var paramName = 'param' + character,
+                pattern = '/opa<' + paramName + '>',
+                route = Route({ name : 'opa', pattern : pattern }),
+                obj = {};
+
+            obj[paramName] = 'value';
+            test.strictEqual(route.build(), pattern);
+            test.strictEqual(route.build(obj), pattern + '?' + encodeURIComponent(paramName) + '=value');
+        });
+
+        test.done();
+    },
+
+    'You musn\'t start params name with digit' : function(test) {
+        [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ].forEach(function(character) {
+            var paramName = character + 'param',
+                pattern = '/opa<' + paramName + '>',
+                route = Route({ name : 'opa', pattern : pattern }),
+                obj = {};
+
+            obj[paramName] = 'value';
+            test.strictEqual(route.build(), pattern);
+            test.strictEqual(route.build(obj), pattern + '?' + encodeURIComponent(paramName) + '=value');
+        });
 
         test.done();
     }

@@ -156,12 +156,12 @@
         }
 
         if (typeof options.name !== 'string') {
-            throw new Error('You must specify name of route');
+            throw new Error('You must specify the name of the route');
         }
         this._name = options.name;
 
         if (typeof options.pattern !== 'string') {
-            throw new Error('You must specify pattern of route');
+            throw new Error('You must specify the pattern of the route');
         }
         this._pattern = options.pattern;
 
