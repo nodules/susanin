@@ -31,7 +31,7 @@
 
             arguments.length || (query = location.search.substr(1));
 
-            if (!query) {
+            if ( ! query) {
                 return params;
             }
 
@@ -75,7 +75,7 @@
                 tmpArray,
                 i, size, key;
 
-            if (!params) {
+            if ( ! params) {
                 return query;
             }
 
@@ -439,7 +439,9 @@
         var newParams = {},
             queryParams = {},
             queryString,
-            key;
+            key,
+            isMainParam,
+            i, size;
 
         for (key in params) {
             if (
@@ -447,7 +449,15 @@
                 params[key] !== null &&
                 typeof params[key] !== 'undefined'
             ) {
-                if (this._paramsMap.indexOf(key) !== -1) { // @todo indexOf
+                isMainParam = false;
+                for (i = 0, size = this._paramsMap.length; i < size; ++i) {
+                    if (this._paramsMap[i] === key) {
+                        isMainParam = true;
+                        break;
+                    }
+                }
+
+                if (isMainParam) {
                     newParams[key] = params[key];
                 } else {
                     queryParams[key] = params[key];
@@ -488,7 +498,7 @@
             this._paramsMap,
             this._parseRegExpSource,
             this._buildFnSource,
-            this._data && this._data.controller // @todo
+            this._data
         ];
     };
 
@@ -509,7 +519,7 @@
      * Добавляет роут
      * @param {Object} opts
      */
-    Router.prototype.addRoute = function(opts) {      // @todo => opts
+    Router.prototype.addRoute = function(opts) {
         var route;
 
         route = new Route(opts);

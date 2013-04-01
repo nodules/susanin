@@ -4,6 +4,7 @@ UGLIFYJS := $(BIN_PATH)uglifyjs
 NODEUNIT := $(BIN_PATH)nodeunit
 
 all: tests
+
 tests: jshint unittests
 
 unittests: $(NODEUNIT) minify
