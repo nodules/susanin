@@ -55,14 +55,13 @@ module.exports = {
         test.done();
     },
 
-    'route.bind() must return right data' : function(test) {
-        var route = Route({ name : 'opa', pattern : '/opa' }),
-            data = {
+    'route.getData() must return right data' : function(test) {
+        var data = {
                 foo : 'bar'
-            };
+            },
+            route = Route({ name : 'opa', pattern : '/opa', data : data });
 
-        route.bind(data);
-        test.strictEqual(route.bind(), data);
+        test.strictEqual(route.getData(), data);
         test.done();
     },
 

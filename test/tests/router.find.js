@@ -20,7 +20,9 @@ module.exports = {
         susanin.addRoute({
             name : 'third',
             pattern : '/first',
-            method : 'post'
+            data : {
+                method : 'post'
+            }
         });
 
         susanin.addRoute({
@@ -36,7 +38,7 @@ module.exports = {
 
         test.strictEqual(finded[0], this.susanin.getRouteByName('first'));
         test.deepEqual(finded[1], {});
-        test.strictEqual(this.susanin.find('/first', 'post')[0], this.susanin.getRouteByName('third'));
+        test.strictEqual(this.susanin.find('/first', { method : 'post' })[0], this.susanin.getRouteByName('third'));
         test.strictEqual(this.susanin.find('/f'), null);
 
         test.done();

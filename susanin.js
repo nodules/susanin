@@ -113,9 +113,6 @@
         };
     })();
 
-    var HTTP_METHODS = [ 'GET', 'POST', 'DELETE', 'PUT' ];
-    var HTTP_METHODS_REGEXP = new RegExp('^(' + HTTP_METHODS.join('|') + ')$');
-
     var PARAM_OPENED_CHAR = '<';
     var PARAM_CLOSED_CHAR = '>';
 
@@ -142,13 +139,28 @@
      * @param {Object} options
      *  @param {String} options.name имя роута
      *  @param {String} options.pattern паттерн соответствия
-     *  @param {String} [options.method] http метод
      *  @param {Object} [options.conditions] условия, накладываемые на параметры
      *  @param {Object} [options.defaults] умалчиваемые значения параметров
+     * @param {Array} _options
      */
-    function Route(options) {
+    function Route(options, _options) {
         if ( ! (this instanceof Route)) {
-            return new Route(options);
+            return new Route(options, _options);
+        }
+
+        if (_options) {
+            this._name = _options[0];
+            this._defaults = _options[1];
+            this._paramsMap = _options[2];
+            this._parseRegExpSource = _options[3];
+            this._buildFnSource = _options[4];
+            this._data = _options[5];
+
+            /*jshint evil:true */
+            this._buildFn = new Function('p', this._buildFnSource);
+            this._parseRegExp = new RegExp(this._parseRegExpSource);
+
+            return;
         }
 
         if ( ! options || typeof options !== 'object') {
@@ -165,19 +177,9 @@
         }
         this._pattern = options.pattern;
 
-        if (typeof options.method === 'string') {
-            this._method = options.method.toUpperCase();
-
-            if ( ! HTTP_METHODS_REGEXP.test(this._method)) {
-                throw 'Invalid http method "' + this._method + '"';
-            }
-        } else {
-            this._method = 'GET';
-        }
-
         this._conditions = options.conditions && typeof options.conditions === 'object' ? options.conditions : {};
         this._defaults = options.defaults && typeof options.defaults === 'object' ? options.defaults : {};
-        this._data = null;
+        this._data = options.data;
 
         /* Добавим query_string */
         this._pattern += GROUP_OPENED_CHAR +
@@ -383,48 +385,54 @@
     /**
      * Парсит переданный путь, возвращает объект с параметрами либо null
      * @param {String} path
-     * @param {String} method
+     * @param {Object} matchObject
      * @return {Object}
      */
-    Route.prototype.parse = function(path, method) {
+    Route.prototype.parse = function(path, matchObject) {
         var ret = null,
             matches,
             i, size,
             key,
             queryParams;
 
-        if (method) {
-            method = method.toUpperCase();
-        } else {
-            method = 'GET';
+        if (matchObject && typeof matchObject === 'object') {
+            for (key in matchObject) {
+                if (matchObject.hasOwnProperty(key)) {
+                    if ( ! this._data || typeof this._data !== 'object' || this._data[key] !== matchObject[key]) {
+                        return ret;
+                    }
+                }
+            }
         }
 
-        if (this._method === method) {
-            matches = path.match(this._parseRegExp);
+        matches = path.match(this._parseRegExp);
 
-            if (matches) {
-                ret = {};
+        if (matches) {
+            ret = {};
 
-                for (i = 1, size = matches.length; i < size; ++i) {
-                    if (typeof matches[i] !== 'undefined') {
+            for (i = 1, size = matches.length; i < size; ++i) {
+                if (typeof matches[i] !== 'undefined') {
+
+                    // IE lt 9
+                    if (matches[i] !== '') {
                         ret[this._paramsMap[i - 1]] = matches[i];
                     }
                 }
-
-                for (key in this._defaults) {
-                    if (hasOwnProp.call(this._defaults, key) && ! hasOwnProp.call(ret, key)) {
-                        ret[key] = this._defaults[key];
-                    }
-                }
-
-                queryParams = querystring.parse(ret.query_string);
-                for (key in queryParams) {
-                    if (hasOwnProp.call(queryParams, key) && ! hasOwnProp.call(ret, key)) {
-                        ret[key] = queryParams[key];
-                    }
-                }
-                delete ret.query_string;
             }
+
+            for (key in this._defaults) {
+                if (hasOwnProp.call(this._defaults, key) && ! hasOwnProp.call(ret, key)) {
+                    ret[key] = this._defaults[key];
+                }
+            }
+
+            queryParams = querystring.parse(ret.query_string);
+            for (key in queryParams) {
+                if (hasOwnProp.call(queryParams, key) && ! hasOwnProp.call(ret, key)) {
+                    ret[key] = queryParams[key];
+                }
+            }
+            delete ret.query_string;
         }
 
         return ret;
@@ -471,20 +479,8 @@
         return this._buildFn(newParams);
     };
 
-    /**
-     * Связывает данные с роутом
-     * геттер и сеттер
-     * @param {Object} data
-     * @return {Route}
-     */
-    Route.prototype.bind = function(data) {
-        if (typeof data === 'undefined') {
-            return this._data;
-        }
-
-        this._data = data;
-
-        return this;
+    Route.prototype.getData = function() {
+        return this._data;
     };
 
     Route.prototype.getName = function() {
@@ -515,14 +511,10 @@
         this._routesByName = {};
     }
 
-    /**
-     * Добавляет роут
-     * @param {Object} opts
-     */
-    Router.prototype.addRoute = function(opts) {
+    Router.prototype.addRoute = function(options, _options) {
         var route;
 
-        route = new Route(opts);
+        route = new Route(options, _options);
 
         this._routes.push(route);
         this._routesByName[route.getName()] = route;
@@ -564,16 +556,25 @@
      * @return {Array}
      */
     Router.prototype.bundle = function() {
-        var ret = null,
+        var ret = [],
             i, size,
             routes = this._routes;
 
         for (i = 0, size = routes.length; i < size; ++i) {
-            ret || (ret = []);
             ret.push(routes[i].bundle());
         }
 
         return ret;
+    };
+
+    Router.prototype.restoreFromBundle = function(bundle) {
+        var i, size;
+
+        for (i = 0, size = bundle.length; i < size; ++i) {
+            this.addRoute(null, bundle[i]);
+        }
+
+        return this;
     };
 
     Router.Route = Route;
