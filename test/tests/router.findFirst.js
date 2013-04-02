@@ -33,13 +33,13 @@ module.exports = {
         callback();
     },
 
-    '"find" method must return array' : function(test) {
-        var finded = this.susanin.find('/first');
+    '"findFirst" method must return array' : function(test) {
+        var finded = this.susanin.findFirst('/first');
 
         test.strictEqual(finded[0], this.susanin.getRouteByName('first'));
         test.deepEqual(finded[1], {});
-        test.strictEqual(this.susanin.find('/first', { method : 'post' })[0], this.susanin.getRouteByName('third'));
-        test.strictEqual(this.susanin.find('/f'), null);
+        test.strictEqual(this.susanin.findFirst({ path : '/first', method : 'post' })[0], this.susanin.getRouteByName('third'));
+        test.strictEqual(this.susanin.findFirst('/f'), null);
 
         test.done();
     }

@@ -384,55 +384,62 @@
 
     /**
      * Парсит переданный путь, возвращает объект с параметрами либо null
-     * @param {String} path
      * @param {Object} matchObject
      * @return {Object}
      */
-    Route.prototype.parse = function(path, matchObject) {
+    Route.prototype.match = function(matchObject) {
         var ret = null,
             matches,
             i, size,
             key,
             queryParams;
 
-        if (matchObject && typeof matchObject === 'object') {
-            for (key in matchObject) {
-                if (matchObject.hasOwnProperty(key)) {
-                    if ( ! this._data || typeof this._data !== 'object' || this._data[key] !== matchObject[key]) {
-                        return ret;
-                    }
+        if (typeof matchObject === 'string') {
+            matchObject = { path : matchObject };
+        } else if ( ! matchObject) {
+            matchObject = {};
+        }
+
+        for (key in matchObject) {
+            if (matchObject.hasOwnProperty(key) && key !== 'path') {
+                if ( ! this._data || typeof this._data !== 'object' || this._data[key] !== matchObject[key]) {
+                    return ret;
                 }
             }
         }
 
-        matches = path.match(this._parseRegExp);
+        if (typeof matchObject.path === 'string') {
+            matches = matchObject.path.match(this._parseRegExp);
 
-        if (matches) {
-            ret = {};
+            if (matches) {
+                ret = {};
 
-            for (i = 1, size = matches.length; i < size; ++i) {
-                if (typeof matches[i] !== 'undefined') {
+                for (i = 1, size = matches.length; i < size; ++i) {
+                    if (typeof matches[i] !== 'undefined') {
 
-                    // IE lt 9
-                    if (matches[i] !== '') {
-                        ret[this._paramsMap[i - 1]] = matches[i];
+                        // IE lt 9
+                        if (matches[i] !== '') {
+                            ret[this._paramsMap[i - 1]] = matches[i];
+                        }
                     }
                 }
-            }
 
-            for (key in this._defaults) {
-                if (hasOwnProp.call(this._defaults, key) && ! hasOwnProp.call(ret, key)) {
-                    ret[key] = this._defaults[key];
+                for (key in this._defaults) {
+                    if (hasOwnProp.call(this._defaults, key) && ! hasOwnProp.call(ret, key)) {
+                        ret[key] = this._defaults[key];
+                    }
                 }
-            }
 
-            queryParams = querystring.parse(ret.query_string);
-            for (key in queryParams) {
-                if (hasOwnProp.call(queryParams, key) && ! hasOwnProp.call(ret, key)) {
-                    ret[key] = queryParams[key];
+                queryParams = querystring.parse(ret.query_string);
+                for (key in queryParams) {
+                    if (hasOwnProp.call(queryParams, key) && ! hasOwnProp.call(ret, key)) {
+                        ret[key] = queryParams[key];
+                    }
                 }
+                delete ret.query_string;
             }
-            delete ret.query_string;
+        } else {
+            ret = {};
         }
 
         return ret;
@@ -524,18 +531,29 @@
         return route;
     };
 
-    /**
-     * Находит первый подходящий роут по пути и методу,
-     * возвращает массив с привязанными данными и распарсенными параметрами либо null, если ни один из роутов не подошёл
-     * @return {Array}
-     */
-    Router.prototype.find = function() {
+    Router.prototype.find = function(matchObject) {
+        var ret = [],
+            parsed,
+            i, size,
+            routes = this._routes;
+
+        for (i = 0, size = routes.length; i < size; ++i) {
+            parsed = routes[i].match(matchObject);
+            if (parsed !== null) {
+                ret.push([ routes[i], parsed ]);
+            }
+        }
+
+        return ret;
+    };
+
+    Router.prototype.findFirst = function(matchObject) {
         var parsed,
             i, size,
             routes = this._routes;
 
         for (i = 0, size = routes.length; i < size; ++i) {
-            parsed = routes[i].parse.apply(routes[i], arguments);
+            parsed = routes[i].match(matchObject);
             if (parsed !== null) {
                 return [ routes[i], parsed ];
             }
