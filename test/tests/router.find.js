@@ -1,29 +1,29 @@
-var Router = require('../susanin.min.js');
+var Susanin = require('../../');
 
 module.exports = {
 
     setUp : function(callback) {
-        var router = this.router = Router();
+        var susanin = this.susanin = Susanin();
 
-        router
+        susanin
             .addRoute({
                 name : 'first',
                 pattern : '/first'
             });
 
-        router
+        susanin
             .addRoute({
                 name : 'second',
                 pattern : '/firsttt'
             });
 
-        router.addRoute({
+        susanin.addRoute({
             name : 'third',
             pattern : '/first',
             method : 'post'
         });
 
-        router.addRoute({
+        susanin.addRoute({
             name : 'fourth',
             pattern : '/fourth'
         });
@@ -32,12 +32,12 @@ module.exports = {
     },
 
     '"find" method must return array' : function(test) {
-        var finded = this.router.find('/first');
+        var finded = this.susanin.find('/first');
 
-        test.strictEqual(finded[0], this.router.getRouteByName('first'));
+        test.strictEqual(finded[0], this.susanin.getRouteByName('first'));
         test.deepEqual(finded[1], {});
-        test.strictEqual(this.router.find('/first', 'post')[0], this.router.getRouteByName('third'));
-        test.strictEqual(this.router.find('/f'), null);
+        test.strictEqual(this.susanin.find('/first', 'post')[0], this.susanin.getRouteByName('third'));
+        test.strictEqual(this.susanin.find('/f'), null);
 
         test.done();
     }
