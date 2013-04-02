@@ -587,7 +587,7 @@
         return ret;
     };
 
-    Router.prototype.restoreFromBundle = function(bundle) {
+    Router.prototype.addRoutesFromBundle = function(bundle) {
         var i, size;
 
         for (i = 0, size = bundle.length; i < size; ++i) {
