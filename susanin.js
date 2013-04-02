@@ -502,13 +502,15 @@
     /**
      * @constructor
      */
-    function Router() {
+    function Router(bundle) {
         if ( ! (this instanceof Router)) {
-            return new Router();
+            return new Router(bundle);
         }
 
         this._routes = [];
         this._routesByName = {};
+
+        bundle && this.restoreFromBundle(bundle);
     }
 
     Router.prototype.addRoute = function(options, _options) {
