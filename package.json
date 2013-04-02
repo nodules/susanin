@@ -1,7 +1,7 @@
 {
     "author" : "Ruslan Kerimov <rus.kerimov@gmail.com>",
     "name" : "susanin",
-    "version" : "0.2.0",
+    "version" : "0.3.0",
     "repository" : {
         "type" : "git",
         "url" : "git://github.com/ruslankerimov/susanin.git"
