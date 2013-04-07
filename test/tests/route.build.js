@@ -4,7 +4,7 @@ var Susanin = require('../../'),
 module.exports = {
 
     '/opa' : function(test) {
-        var route = Route({ name : 'opa', pattern : '/opa' });
+        var route = Route('/opa');
 
         test.strictEqual(route.build(), '/opa');
         test.strictEqual(route.build({}), '/opa');
@@ -21,12 +21,10 @@ module.exports = {
     },
 
     '/opa/<param>' : function(test) {
-        var route = Route({
-                name : 'opa',
-                pattern : '/opa/<param>'
-            });
+        var route = Route('/opa/<param>')
+;
 
-        test.strictEqual(route.build(), '/opa/');
+test.strictEqual(route.build(), '/opa/');
         test.strictEqual(route.build({}), '/opa/');
         test.strictEqual(route.build({ param : 'bar' }), '/opa/bar');
         test.strictEqual(route.build({ param : [ 'bar1', 'bar2' ] }), '/opa/bar1,bar2');
@@ -40,10 +38,7 @@ module.exports = {
     },
 
     '/opa/<param' : function(test) {
-        var route = Route({
-            name : 'opa',
-            pattern : '/opa/<param'
-        });
+        var route = Route('/opa/<param');
 
         test.strictEqual(route.build(), '/opa/<param');
         test.strictEqual(route.build({ param : 'bar' }), '/opa/<param?param=bar');
@@ -55,7 +50,6 @@ module.exports = {
 
     '/opa/<param> with defaults' : function(test) {
         var route = Route({
-                name : 'opa',
                 pattern : '/opa/<param>',
                 defaults : {
                     param : 'value'
@@ -71,10 +65,7 @@ module.exports = {
     },
 
     '/opa(/opapa/<param>)' : function(test) {
-        var route = Route({
-                name : 'opa',
-                pattern : '/opa(/opapa/<param>)'
-            });
+        var route = Route('/opa(/opapa/<param>)');
 
         test.strictEqual(route.build(), '/opa');
         test.strictEqual(route.build({ param : 'bar' }), '/opa/opapa/bar');
@@ -86,7 +77,6 @@ module.exports = {
 
     '/opa(/opapa/<param>) with defaults' : function(test) {
         var route = Route({
-                name : 'opa',
                 pattern : '/opa(/opapa/<param>)',
                 defaults : {
                     param : 'value'
@@ -102,10 +92,7 @@ module.exports = {
     },
 
     '/opa(/opapa/<param1>)(/<param2>)' : function(test) {
-        var route = Route({
-            name : 'opa',
-            pattern : '/opa(/opapa/<param1>)(/<param2>)'
-        });
+        var route = Route('/opa(/opapa/<param1>)(/<param2>)');
 
         test.strictEqual(route.build(), '/opa');
         test.strictEqual(route.build({ param1 : 'bar' }), '/opa/opapa/bar');
@@ -119,7 +106,6 @@ module.exports = {
 
     '/opa(/opapa/<param1>)(/<param2>) with defaults' : function(test) {
         var route = Route({
-            name : 'opa',
             pattern : '/opa(/opapa/<param1>)(/<param2>)',
             defaults : {
                 param1 : 'value1',
@@ -141,7 +127,7 @@ module.exports = {
         [ '+', '.', ',', ' ' ].forEach(function(character) {
             var paramName = 'param' + character,
                 pattern = '/opa<' + paramName + '>',
-                route = Route({ name : 'opa', pattern : pattern }),
+                route = Route(pattern),
                 obj = {};
 
             obj[paramName] = 'value';
@@ -156,7 +142,7 @@ module.exports = {
         [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ].forEach(function(character) {
             var paramName = character + 'param',
                 pattern = '/opa<' + paramName + '>',
-                route = Route({ name : 'opa', pattern : pattern }),
+                route = Route(pattern),
                 obj = {};
 
             obj[paramName] = 'value';

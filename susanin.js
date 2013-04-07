@@ -9,19 +9,18 @@
     var querystring = {
 
         /**
-         * Парсит строку вида "param1=value1&param2=value2&param2&param3=value3"
-         * и возвращает объект:
+         * Parse a string "param1=value1&param2=value2&param2&param3=value3"
+         * and return object:
          * {
          *     param1 : value1,
          *     parma2 : [ value2, '' ],
          *     param3 : value3
          * }
-         * Аналог http://nodejs.org/api/querystring.html#querystring_querystring_parse_str_sep_eq
-         * @static
+         * @link http://nodejs.org/api/querystring.html#querystring_querystring_parse_str_sep_eq
          * @param {String} query
          * @param {String} [sep='&']
          * @param {String} [eq='=']
-         * @return {Object}
+         * @returns {Object}
          */
         parse : function (query, sep, eq) {
             var params = {},
@@ -46,7 +45,7 @@
                 key = decodeURIComponent(tmp[0]);
 
                 if (params.hasOwnProperty(key)) {
-                    if (!Array.isArray(params[key])) {
+                    if ( ! isArray(params[key])) {
                         params[key] = [params[key], value];
                     } else {
                         params[key].push(value);
@@ -60,13 +59,12 @@
         },
 
         /**
-         * Метод обратный parse
-         * Аналог http://nodejs.org/api/querystring.html#querystring_querystring_stringify_obj_sep_eq
-         * @static
+         * Build querystring from object
+         * @link http://nodejs.org/api/querystring.html#querystring_querystring_stringify_obj_sep_eq
          * @param {Object} params
          * @param {String} [sep='&']
          * @param {String} [eq='=']
-         * @return {String}
+         * @returns {String}
          */
         stringify : function (params, sep, eq) {
             var query = '',
@@ -83,7 +81,7 @@
             eq || (eq = '=');
 
             for (key in params) {
-                if (params.hasOwnProperty(key)) {
+                if (hasOwnProp.call(params, key)) {
                     tmpArray = [].concat(params[key]);
                     for (i = 0, size = tmpArray.length; i < size; ++i) {
                         typeOf = typeof tmpArray[i];
@@ -134,14 +132,15 @@
             'g');
 
     /**
-     * Класс роут
+     * Creates new Route
      * @constructor
-     * @param {Object} options
-     *  @param {String} options.name имя роута
-     *  @param {String} options.pattern паттерн соответствия
-     *  @param {Object} [options.conditions] условия, накладываемые на параметры
-     *  @param {Object} [options.defaults] умалчиваемые значения параметров
-     * @param {Array} _options
+     * @param {Object|String} options If it's a string it means pattern for path match
+     *  @param {String} [options.name] Name of the route
+     *  @param {String} options.pattern Pattern for path match
+     *  @param {Object} [options.conditions] Conditions for params in pattern
+     *  @param {Object} [options.defaults] Defaults values for params in pattern
+     *  @param {Object} [options.data] Data that will be bonded with route
+     * @param {Array} [_options] If you want to create instance from bundle made of bunle method
      */
     function Route(options, _options) {
         if ( ! (this instanceof Route)) {
@@ -149,12 +148,11 @@
         }
 
         if (_options) {
-            this._name = _options[0];
-            this._defaults = _options[1];
-            this._paramsMap = _options[2];
-            this._parseRegExpSource = _options[3];
-            this._buildFnSource = _options[4];
-            this._data = _options[5];
+            this._defaults = _options[0];
+            this._paramsMap = _options[1];
+            this._parseRegExpSource = _options[2];
+            this._buildFnSource = _options[3];
+            this._data = _options[4];
 
             /*jshint evil:true */
             this._buildFn = new Function('p', this._buildFnSource);
@@ -163,14 +161,11 @@
             return;
         }
 
+        typeof options === 'string' && (options = { pattern : options });
+
         if ( ! options || typeof options !== 'object') {
             throw new Error('You must specify options');
         }
-
-        if (typeof options.name !== 'string') {
-            throw new Error('You must specify the name of the route');
-        }
-        this._name = options.name;
 
         if (typeof options.pattern !== 'string') {
             throw new Error('You must specify the pattern of the route');
@@ -179,14 +174,15 @@
 
         this._conditions = options.conditions && typeof options.conditions === 'object' ? options.conditions : {};
         this._defaults = options.defaults && typeof options.defaults === 'object' ? options.defaults : {};
-        this._data = options.data;
+        this._data = options.data && typeof options.data === 'object' ? options.data : {};
+        typeof options.name === 'string' && (this._data.name = options.name);
 
-        /* Добавим query_string */
+        /* query_string */
         this._pattern += GROUP_OPENED_CHAR +
             '?' + PARAM_OPENED_CHAR + 'query_string' + PARAM_CLOSED_CHAR +
             GROUP_CLOSED_CHAR;
         this._conditions.query_string = '.*';
-        /* /Добавим query_string */
+        /* /query_string */
 
         this._parts = this._parsePattern(this._pattern);
         this
@@ -195,8 +191,9 @@
     }
 
     /**
-     * Парсит паттерн, дробит его на составляющие
-     * @return {Route}
+     * @param {String} pattern
+     * @returns {Array}
+     * @private
      */
     Route.prototype._parsePattern = function(pattern) {
         var parts = [],
@@ -255,8 +252,13 @@
         this._parseParams(part, parts);
 
         return parts;
-    },
+    };
 
+    /**
+     * @param {String} pattern
+     * @param {Array} parts
+     * @private
+     */
     Route.prototype._parseParams = function(pattern, parts) {
         var matches = pattern.match(PARSE_PARAMS_REGEXP),
             i, size,
@@ -279,113 +281,124 @@
     };
 
     /**
-     * Строит регэксп для проверки
-     * @return {Route}
+     * @returns {Route}
+     * @private
      */
     Route.prototype._buildParseRegExp = function() {
-        var route = this;
-
-        function build(parts) {
-            var ret = '',
-                i, size,
-                part;
-
-            for (i = 0, size = parts.length; i < size; ++i) {
-                part = parts[i];
-
-                if (typeof part === 'string') {
-                    ret += escape(part);
-                } else if (part && part.what === 'param') {
-                    route._paramsMap.push(part.name);
-                    ret += '(' + buildParamValueRegExpSource(part.name) + ')';
-                } else if (part && part.what === 'optional') {
-                    ret += '(?:' + build(part.parts) + ')?';
-                }
-            }
-
-            return ret;
-        }
-
-        function buildParamValueRegExpSource(paramName) {
-            var ret = '',
-                condition = route._conditions && route._conditions[paramName];
-
-            if (condition) {
-                if (isArray(condition)) {
-                    ret = '(?:' + condition.join('|') + ')';
-                } else {
-                    ret = condition + '';
-                }
-            } else {
-                ret =  PARAM_VALUE_REGEXP_SOURCE;
-            }
-
-            return ret;
-        }
-
         this._paramsMap = [];
-        this._parseRegExpSource = '^' + build(this._parts) + '$';
+        this._parseRegExpSource = '^' + this._buildParseRegExpParts(this._parts) + '$';
         this._parseRegExp = new RegExp(this._parseRegExpSource);
 
         return this;
     };
 
     /**
-     * Строит функцию для составления пути
-     * @return {Route}
+     * @param {Array} parts
+     * @returns {String}
+     * @private
      */
-    Route.prototype._buildBuildFn = function() {
-        /*jshint evil:true */
-        var route = this;
+    Route.prototype._buildParseRegExpParts = function(parts) {
+        var ret = '',
+            i, size,
+            part;
 
-        function build(parts) {
-            var ret = '""',
-                i, sizeI, j, sizeJ,
-                part, name;
+        for (i = 0, size = parts.length; i < size; ++i) {
+            part = parts[i];
 
-            for (i = 0, sizeI = parts.length; i < sizeI; ++i) {
-                part = parts[i];
-
-                if (typeof part === 'string') {
-                    ret += '+"' + escape(part) + '"' ;
-                } else if (part && part.what === 'param') {
-                    ret += '+(h.call(p,"' + escape(part.name) + '")?' +
-                        'p["' + escape(part.name) + '"]:' +
-                        (route._defaults && hasOwnProp.call(route._defaults, part.name) ?
-                            '"' + escape(route._defaults[part.name]) +  '"' :
-                            '""') +
-                        ')';
-                } else if (part && part.what === 'optional') {
-                    ret += '+((false';
-
-                    for (j = 0, sizeJ = part.dependOnParams.length; j < sizeJ; ++j) {
-                        name = part.dependOnParams[j];
-
-                        ret += '||(h.call(p,"' + escape(name) + '")' +
-                            (route._defaults && hasOwnProp.call(route._defaults, name) ?
-                                '&&p["' + escape(name) + '"]!=="' +
-                                    escape(route._defaults[name]) + '"' :
-                                '') +
-                            ')';
-                    }
-
-                    ret += ')?(' + build(part.parts) + '):"")';
-                }
+            if (typeof part === 'string') {
+                ret += escape(part);
+            } else if (part && part.what === 'param') {
+                this._paramsMap.push(part.name);
+                ret += '(' + this._buildParamValueRegExpSource(part.name) + ')';
+            } else if (part && part.what === 'optional') {
+                ret += '(?:' + this._buildParseRegExpParts(part.parts) + ')?';
             }
-
-            return ret;
         }
 
-        this._buildFnSource = 'var h=({}).hasOwnProperty;return ' + build(this._parts) + ';';
+        return ret;
+    };
+
+    /**
+     * @param {String} paramName
+     * @returns {String}
+     * @private
+     */
+    Route.prototype._buildParamValueRegExpSource = function(paramName) {
+        var ret,
+            condition = this._conditions[paramName];
+
+        if (condition) {
+            if (isArray(condition)) {
+                ret = '(?:' + condition.join('|') + ')';
+            } else {
+                ret = condition + '';
+            }
+        } else {
+            ret =  PARAM_VALUE_REGEXP_SOURCE;
+        }
+
+        return ret;
+    };
+
+    /**
+     * @returns {Route}
+     * @private
+     */
+    Route.prototype._buildBuildFn = function() {
+        this._buildFnSource = 'var h=({}).hasOwnProperty;return ' + this._buildBuildFnParts(this._parts) + ';';
+        /*jshint evil:true */
         this._buildFn = new Function('p', this._buildFnSource);
 
         return this;
     };
 
     /**
-     * Парсит переданный путь, возвращает объект с параметрами либо null
-     * @param {Object} matchObject
-     * @return {Object}
+     * @param {Array} parts
+     * @returns {String}
+     * @private
+     */
+    Route.prototype._buildBuildFnParts = function(parts) {
+        var ret = '""',
+            i, sizeI, j, sizeJ,
+            part, name;
+
+        for (i = 0, sizeI = parts.length; i < sizeI; ++i) {
+            part = parts[i];
+
+            if (typeof part === 'string') {
+                ret += '+"' + escape(part) + '"' ;
+            } else if (part && part.what === 'param') {
+                ret += '+(h.call(p,"' + escape(part.name) + '")?' +
+                    'p["' + escape(part.name) + '"]:' +
+                    (this._defaults && hasOwnProp.call(this._defaults, part.name) ?
+                        '"' + escape(this._defaults[part.name]) +  '"' :
+                        '""') +
+                    ')';
+            } else if (part && part.what === 'optional') {
+                ret += '+((false';
+
+                for (j = 0, sizeJ = part.dependOnParams.length; j < sizeJ; ++j) {
+                    name = part.dependOnParams[j];
+
+                    ret += '||(h.call(p,"' + escape(name) + '")' +
+                        (this._defaults && hasOwnProp.call(this._defaults, name) ?
+                            '&&p["' + escape(name) + '"]!=="' +
+                                escape(this._defaults[name]) + '"' :
+                            '') +
+                        ')';
+                }
+
+                ret += ')?(' + this._buildBuildFnParts(part.parts) + '):"")';
+            }
+        }
+
+        return ret;
+    };
+
+    /**
+     * Matches object with route
+     * @param {Object|String} matchObject
+     * @returns {Object|null}
      */
     Route.prototype.match = function(matchObject) {
         var ret = null,
@@ -401,8 +414,8 @@
         }
 
         for (key in matchObject) {
-            if (matchObject.hasOwnProperty(key) && key !== 'path') {
-                if ( ! this._data || typeof this._data !== 'object' || this._data[key] !== matchObject[key]) {
+            if (hasOwnProp.call(matchObject, key) && key !== 'path') {
+                if (this._data[key] !== matchObject[key]) {
                     return ret;
                 }
             }
@@ -446,9 +459,9 @@
     };
 
     /**
-     * Составляет путь по переданным параметрам
+     * Build path from params
      * @param {Object} params
-     * @return {String}
+     * @returns {String}
      */
     Route.prototype.build = function(params) {
         var newParams = {},
@@ -486,17 +499,28 @@
         return this._buildFn(newParams);
     };
 
+    /**
+     * Returns binded with route data
+     * @returns {*}
+     */
     Route.prototype.getData = function() {
         return this._data;
     };
 
+    /**
+     * Returns name of the route
+     * @returns {*}
+     */
     Route.prototype.getName = function() {
-        return this._name;
+        return this._data.name;
     };
 
+    /**
+     * Returns bundle
+     * @returns {Array}
+     */
     Route.prototype.bundle = function() {
         return [
-            this._name,
             this._defaults,
             this._paramsMap,
             this._parseRegExpSource,
@@ -507,7 +531,9 @@
 
 
     /**
+     * Creates new Router
      * @constructor
+     * @param {Array} [bundle]
      */
     function Router(bundle) {
         if ( ! (this instanceof Router)) {
@@ -517,20 +543,33 @@
         this._routes = [];
         this._routesByName = {};
 
-        bundle && this.restoreFromBundle(bundle);
+        bundle && this.addRoutesFromBundle(bundle);
     }
 
+    /**
+     * Add route
+     * @param {Object|String} options
+     * @param [_options]
+     * @returns {Route}
+     */
     Router.prototype.addRoute = function(options, _options) {
-        var route;
+        var route,
+            name;
 
         route = new Route(options, _options);
 
         this._routes.push(route);
-        this._routesByName[route.getName()] = route;
+        name = route.getName();
+        name && (this._routesByName[name] = route);
 
         return route;
     };
 
+    /**
+     * Returns all successfully matched routes
+     * @param {Object|String} matchObject
+     * @returns {Array|null}
+     */
     Router.prototype.find = function(matchObject) {
         var ret = [],
             parsed,
@@ -547,6 +586,11 @@
         return ret;
     };
 
+    /**
+     * Returns first successfully matched route
+     * @param {Object|String} matchObject
+     * @returns {Array|null}
+     */
     Router.prototype.findFirst = function(matchObject) {
         var parsed,
             i, size,
@@ -563,17 +607,17 @@
     };
 
     /**
-     * Возвращает роут по имени
+     * Returns a route by its name
      * @param {String} name
-     * @return {Route}
+     * @returns {Route}
      */
     Router.prototype.getRouteByName = function(name) {
         return this._routesByName[name] || null;
     };
 
     /**
-     * Формирует бандл для прокидывания на клиент
-     * @return {Array}
+     * Returns bundle of all routes
+     * @returns {Array}
      */
     Router.prototype.bundle = function() {
         var ret = [],
@@ -587,6 +631,11 @@
         return ret;
     };
 
+    /**
+     * Add routes from bunle
+     * @param bundle
+     * @returns {Router}
+     */
     Router.prototype.addRoutesFromBundle = function(bundle) {
         var i, size;
 

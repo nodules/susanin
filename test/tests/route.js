@@ -9,14 +9,14 @@ module.exports = {
     },
 
     '"Route" must be constructor' : function(test) {
-        var route = new Route({ name : 'opa', pattern : '/opa' });
+        var route = new Route({ pattern : '/opa' });
 
         test.ok(route instanceof Route);
         test.done();
     },
 
     '"Route" can be called without "new"' : function(test) {
-        var route = Route({ name : 'opa', pattern : '/opa' });
+        var route = Route({ pattern : '/opa' });
 
         test.ok(route instanceof Route);
         test.done();
@@ -25,17 +25,6 @@ module.exports = {
     '"options" is mandatory' : function(test) {
         try {
             var route = Route();
-
-            test.ok(false);
-        } catch (e) {
-            test.ok(true);
-        }
-        test.done();
-    },
-
-    '"options.name" property is mandatory' : function(test) {
-        try {
-            var route = Route({ pattern : '/opa' });
 
             test.ok(false);
         } catch (e) {
@@ -55,20 +44,14 @@ module.exports = {
         test.done();
     },
 
-    'route.getData() must return right data' : function(test) {
-        var data = {
-                foo : 'bar'
-            },
-            route = Route({ name : 'opa', pattern : '/opa', data : data });
+    '"options" can be string' : function(test) {
+        try {
+            var route = Route('/opa');
 
-        test.strictEqual(route.getData(), data);
-        test.done();
-    },
-
-    'route.getName() must return the name of the route' : function(test) {
-        var route = Route({ name : 'opa', pattern : '/opa' });
-
-        test.strictEqual(route.getName(), 'opa');
+            test.ok(true);
+        } catch (e) {
+            test.ok(false);
+        }
         test.done();
     }
 

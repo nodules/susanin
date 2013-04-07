@@ -4,12 +4,10 @@ var Susanin = require('../../'),
 module.exports = {
 
     '/opa' : function(test) {
-        var route = Route({
-            name : 'opa',
-            pattern : '/opa'
-        });
+        var route = Route('/opa')
+;
 
-        test.deepEqual(route.match('/opapa'), null);
+test.deepEqual(route.match('/opapa'), null);
         test.deepEqual(route.match('/opa'), {});
         test.deepEqual(route.match('/opa?foo'), { foo : '' });
         test.deepEqual(route.match('/opa?foo=bar'), { foo : 'bar' });
@@ -22,7 +20,6 @@ module.exports = {
 
     '/opa with defaults' : function(test) {
         var route = Route({
-            name : 'opa',
             pattern : '/opa',
             defaults : {
                 param : 'value'
@@ -39,7 +36,6 @@ module.exports = {
 
     '/opa/<param>' : function(test) {
         var route = Route({
-            name : 'opa',
             pattern : '/opa/<param>'
         });
 
@@ -55,7 +51,6 @@ module.exports = {
 
     '/opa/<param> with defaults' : function(test) {
         var route = Route({
-            name : 'opa',
             pattern : '/opa/<param>',
             defaults : {
                 param : 'value3',
@@ -75,7 +70,6 @@ module.exports = {
 
     '/opa/<param> with conditions like array' : function(test) {
         var route = Route({
-            name : 'opa',
             pattern : '/opa/<param>',
             conditions : {
                 param : [ 'value1', 'value2', 'value3' ]
@@ -95,7 +89,6 @@ module.exports = {
 
     '/opa/<param> with conditions like RegExp' : function(test) {
         var route = Route({
-            name : 'opa',
             pattern : '/opa/<param>',
             conditions : {
                 param : 'value[0-9]'
@@ -117,7 +110,6 @@ module.exports = {
 
     '/opa(/opapa/<param>)' : function(test) {
         var route = Route({
-            name : 'opa',
             pattern : '/opa(/opapa/<param>)'
         });
 
@@ -135,7 +127,6 @@ module.exports = {
 
     '/opa(/opapa/<param>) with defaults' : function(test) {
         var route = Route({
-            name : 'opa',
             pattern : '/opa(/opapa/<param>)',
             defaults : {
                 param : 'value'
@@ -156,7 +147,6 @@ module.exports = {
 
     '/opa(/opapa/<param>) with conditions and defaults' : function(test) {
         var route = Route({
-            name : 'opa',
             pattern : '/opa(/opapa/<param>)',
             conditions : {
                 param : 'value[0-9]'
@@ -183,7 +173,6 @@ module.exports = {
 
     '/opa/<param1>(/opapa/<param2>(/<param3>))(/)' : function(test) {
         var route = Route({
-            name : 'opa',
             pattern : '/opa/<param1>(/opapa/<param2>(/<param3>))(/)',
             conditions : {
                 param1 : 'value[0-2]',
