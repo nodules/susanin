@@ -4,7 +4,7 @@ Susanin is a routing library which can be used in any JavaScript environments.
 
 ## Usages
 
-* `susanin.js` - source code with comments
+* `susanin.js` - uncompressed source code with comments
 * `susanin.min.js` - compressed code
 
 In browser just include a script file in your document:
@@ -19,13 +19,13 @@ npm install susanin
 
 ## Examples
 
-* The most simple:
+* The simplest:
 
 ```javascript
 var route = Susanin.Route('/products');
 
-route.match('/produc');             // => null 
-route.match('/products');           // => {} 
+console.log(route.match('/produc'));             // => null 
+console.log(route.match('/products'));           // => {} 
 ```
 
 * More complex, with a param in pattern:
@@ -33,9 +33,9 @@ route.match('/products');           // => {}
 ```javascript
 var route = Susanin.Route('/products/<id>');
 
-route.match('/products');               // => null
-route.match('/products/321');           // => { id : '321' }
-route.match('/products/321?id=123');    // => { id : '321' }
+console.log(route.match('/products'));               // => null
+console.log(route.match('/products/321'));           // => { id : '321' }
+console.log(route.match('/products/321?id=123'));    // => { id : '321' }
 ```
 
 * With query params in path:
@@ -43,17 +43,17 @@ route.match('/products/321?id=123');    // => { id : '321' }
 ```javascript
 var route = Susanin.Route('/products');
  
-route.match('/products?id=321&category=shoes&category=new');   
+console.log(route.match('/products?id=321&category=shoes&category=new'));   
 // => { id : '321', category : [ 'shoes', 'new' ] } 
 ```
 
 * With an optional group:
 
 ```javascript
-var route = Susanin.Route('/products(/<id>)');
+var route = Susanin.Route('/products(/<id>)'));
 
-route.match('/products');           // => {}
-route.match('/products/321');       // => { id : '321' }
+console.log(route.match('/products'));           // => {}
+console.log(route.match('/products/321'));       // => { id : '321' }
 ```
 
 * With a default value of param:
@@ -65,8 +65,8 @@ var route = Susanin.Route({
         id : '123'
     });
 
-route.match('/products');           // => { id : '123' }
-route.match('/products/321');       // => { id : '321' }
+console.log(route.match('/products'));           // => { id : '123' }
+console.log(route.match('/products/321'));       // => { id : '321' }
 ```
 
 * If you want to specify a regexp for param:
@@ -81,10 +81,10 @@ var route = Susanin.Route({
         id : '\\d{3,4}'
     });
 
-route.match('/products');           // => { id : '123' }
-route.match('/products/321');       // => { id : '321' }
-route.match('/products/a321');      // => null
-route.match('/products/32');        // => null
+console.log(route.match('/products'));           // => { id : '123' }
+console.log(route.match('/products/321'));       // => { id : '321' }
+console.log(route.match('/products/a321'));      // => null
+console.log(route.match('/products/32'));        // => null
 ```
 
 * The most complex:
@@ -101,12 +101,12 @@ var route = Susanin.Route({
         id : '\\d{3,4}'
     });
 
-route.match('/prod');               // => null
-route.match('/products');           // => { category : 'shoes', id : '123' }
-route.match('/products/');          // => { category : 'shoes', id : '123' }
-route.match('/products/jeans');     // => { category : 'jeans', id : '123' }
-route.match('/products/skirt');     // => null
-route.match('/products/shirt/321'); // => { category : 'shirt', id : '321' }
-route.match('/products/shirt/32');  // => null
-route.match('/products/shoes/');    // => { category : 'shoes', id : '123' }
+console.log(route.match('/prod'));               // => null
+console.log(route.match('/products'));           // => { category : 'shoes', id : '123' }
+console.log(route.match('/products/'));          // => { category : 'shoes', id : '123' }
+console.log(route.match('/products/jeans'));     // => { category : 'jeans', id : '123' }
+console.log(route.match('/products/skirt'));     // => null
+console.log(route.match('/products/shirt/321')); // => { category : 'shirt', id : '321' }
+console.log(route.match('/products/shirt/32'));  // => null
+console.log(route.match('/products/shoes/'));    // => { category : 'shoes', id : '123' }
 ```
