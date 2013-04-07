@@ -2,12 +2,12 @@
 
 Susanin is a routing library which can be used in any JavaScript environments.
 
-## Usages
+## Getting Started
 
 * `susanin.js` - uncompressed source code with comments
 * `susanin.min.js` - compressed code
 
-In browser just include a script file in your document:
+In the browsers just include the file in your document:
 ```html
 <script src="/path/to/susanin.min.js"></script>
 ```
@@ -63,7 +63,8 @@ var route = Susanin.Route({
     pattern : '/products(/<id>)',
     defaults : {
         id : '123'
-    });
+    }
+});
 
 console.log(route.match('/products'));           // => { id : '123' }
 console.log(route.match('/products/321'));       // => { id : '321' }
@@ -79,7 +80,8 @@ var route = Susanin.Route({
     },
     conditions : {
         id : '\\d{3,4}'
-    });
+    }
+});
 
 console.log(route.match('/products'));           // => { id : '123' }
 console.log(route.match('/products/321'));       // => { id : '321' }
@@ -99,7 +101,8 @@ var route = Susanin.Route({
     conditions : {
         category : [ 'shoes', 'jeans', 'shirt' ]
         id : '\\d{3,4}'
-    });
+    }
+});
 
 console.log(route.match('/prod'));               // => null
 console.log(route.match('/products'));           // => { category : 'shoes', id : '123' }
@@ -110,3 +113,44 @@ console.log(route.match('/products/shirt/321')); // => { category : 'shirt', id 
 console.log(route.match('/products/shirt/32'));  // => null
 console.log(route.match('/products/shoes/'));    // => { category : 'shoes', id : '123' }
 ```
+
+* You can bind any data with a route and match on these:
+
+```javascript
+var route = Susanin.Route({ 
+    pattern : '/products/<category>',
+    data : {
+        method : 'GET',
+        controller : 'products'
+    }
+});
+
+console.log(route.getData());                     // => { method : 'GET', controller : 'products' }
+console.log(route.match({ method : 'POST' });     // => null
+console.log(route.match({ method : 'GET' });      // => {}
+console.log(route.match({ 
+    path : '/products/shoes', 
+    method : 'GET' 
+});                                               // => { category : 'shoes' }
+```
+
+* Set of routes
+
+```
+var susanin = Susanin();
+
+susanin.addRoute('/contacts');
+susanin.addRoute('/products/<category>');
+susanin.addRoute({
+    pattern : '/(<controller>(/<action>(/<id>)))',
+    defaults : {
+        controller : 'index',
+        action : 'build'
+    }
+});
+
+console.log(susanin.findFirst('/'));                  // => [ #route, { controller : 'index', action : 'build' } ]
+console.log(susanin.findFirst('/products'));          // => [ #route, { controller : 'products', action : 'build' } ]
+console.log(susanin.findFirst('/products/shoes'));    // => [ #route, { category : 'shoes' } ]
+```
+
