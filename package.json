@@ -1,7 +1,12 @@
 {
-    "author" : "Ruslan Kerimov <rus.kerimov@gmail.com>",
     "name" : "susanin",
-    "version" : "0.1.6",
+    "version" : "0.1.7",
+    "author" : {
+        "name" : "Ruslan Kerimov",
+        "email" : "rus.kerimov@gmail.com"
+    },
+    "description" : "Router system which can be used in any JavaScript environments",
+    "keywords" : [ "router", "routes", "routing" ],
     "repository" : {
         "type" : "git",
         "url" : "git://github.com/ruslankerimov/susanin.git"
@@ -18,7 +23,8 @@
     },
     "optionalDependencies" : {},
     "main" : "susanin",
-    "engines" : {
-        "node" : "*"
-    }
+    "bugs" : {
+        "url" : "https://github.com/ruslankerimov/susanin/issues"
+    },
+    "license": "MIT"
 }
