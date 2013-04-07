@@ -10,7 +10,7 @@ Susanin is a routing library which can be used in any JavaScript environments.
 var route = Susanin.Route('/products');
 
 route.match('/produc');             // => null 
-route.match('/products?id=321');    // => { id : '321' } 
+route.match('/products');           // => {} 
 ```
 
 * More complex, with a param in pattern:
@@ -21,6 +21,14 @@ var route = Susanin.Route('/products/<id>');
 route.match('/products');               // => null
 route.match('/products/321');           // => { id : '321' }
 route.match('/products/321?id=123');    // => { id : '321' }
+```
+
+* With query params in path:
+
+```javascript
+var route = Susanin.Route('/products');
+ 
+route.match('/products?id=321&category=shoes&category=new');    // => { id : '321', category : [ 'shoes', 'new' ] } 
 ```
 
 * With an optional group:
