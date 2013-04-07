@@ -134,7 +134,7 @@ console.log(route.match({
 });                                               // => { category : 'shoes' }
 ```
 
-* Set of routes
+* Set of routes:
 
 ```
 var susanin = Susanin();
@@ -152,5 +152,19 @@ susanin.addRoute({
 console.log(susanin.findFirst('/'));                  // => [ #route, { controller : 'index', action : 'build' } ]
 console.log(susanin.findFirst('/products'));          // => [ #route, { controller : 'products', action : 'build' } ]
 console.log(susanin.findFirst('/products/shoes'));    // => [ #route, { category : 'shoes' } ]
+```
+
+* Susanin can build a path:
+
+```javascript
+var route = Susanin.Route({ 
+    pattern : '/products(/cat_<category>)(/)',
+    defaults : { category : 'shoes' }
+});
+
+console.log(route.build());                           // => '/products'
+console.log(route.build({ category : 'jeans' }));     // => '/products/cat_jeans'
+console.log(route.build({ category : 'shoes' }));     // => '/products'
+
 ```
 
