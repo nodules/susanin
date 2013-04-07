@@ -28,7 +28,8 @@ route.match('/products/321?id=123');    // => { id : '321' }
 ```javascript
 var route = Susanin.Route('/products');
  
-route.match('/products?id=321&category=shoes&category=new');    // => { id : '321', category : [ 'shoes', 'new' ] } 
+route.match('/products?id=321&category=shoes&category=new');   
+// => { id : '321', category : [ 'shoes', 'new' ] } 
 ```
 
 * With an optional group:
