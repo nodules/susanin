@@ -2,6 +2,21 @@
 
 Susanin is a routing library which can be used in any JavaScript environments.
 
+## Usages
+
+* `susanin.js` - source code with comments
+* `susanin.min.js` - compressed code
+
+In browser just include a script file in your document:
+```html
+<script src="/path/to/susanin.min.js"></script>
+```
+
+You can install Susanin on Node.js using [NPM](http://npmjs.org):
+```
+npm install susanin
+```
+
 ## Examples
 
 * The most simple:
