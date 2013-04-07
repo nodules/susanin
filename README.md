@@ -24,8 +24,8 @@ npm install susanin
 ```javascript
 var route = Susanin.Route('/products');
 
-console.log(route.match('/produc'));             // => null 
-console.log(route.match('/products'));           // => {} 
+console.log(route.match('/produc'));                  // => null 
+console.log(route.match('/products'));                // => {} 
 ```
 
 * More complex, with a param in pattern:
