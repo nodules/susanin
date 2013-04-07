@@ -69,7 +69,7 @@ route.match('/products');           // => { id : '123' }
 route.match('/products/321');       // => { id : '321' }
 ```
 
-* If you want to specify regexp for param:
+* If you want to specify a regexp for param:
 
 ```javascript
 var route = Susanin.Route({ 
