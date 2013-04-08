@@ -136,7 +136,7 @@ console.log(route.match({
 
 * Set of routes:
 
-```
+```javascript
 var susanin = Susanin();
 
 susanin.addRoute('/contacts');
