@@ -90,7 +90,7 @@ console.log(route.match('/products/32'));        // => null
 ```
 
 * The most complex:
- 
+
 ```javascript
 var route = Susanin.Route({ 
     pattern : '/products(/<category>(/<id>))(/)',
