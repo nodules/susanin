@@ -9,6 +9,22 @@
     var querystring = {
 
         /**
+         * @param {String} str
+         * @returns {String}
+         */
+        decode : function(str) {
+            var ret;
+
+            try {
+                ret = decodeURIComponent(str.replace(/\+/g, '%20'));
+            } catch (e) {
+                ret = str;
+            }
+
+            return ret;
+        },
+
+        /**
          * Parse a string "param1=value1&param2=value2&param2&param3=value3"
          * and return object:
          * {
@@ -41,8 +57,8 @@
 
             for (i = 0, size = queryParams.length; i < size; ++i) {
                 tmp = queryParams[i].split(eq);
-                value = typeof tmp[1] !== 'undefined' ? decodeURIComponent(tmp[1].replace(/\+/g, '%20')) : '';
-                key = decodeURIComponent(tmp[0]);
+                value = typeof tmp[1] !== 'undefined' ? querystring.decode(tmp[1]) : '';
+                key = querystring.decode(tmp[0]);
 
                 if (params.hasOwnProperty(key)) {
                     if ( ! isArray(params[key])) {
