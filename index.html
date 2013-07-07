@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Susanin — javascript router system</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="./codemirror-3.14/lib/codemirror.css" rel="stylesheet">
+    <style>
+        .CodeMirror
+        {
+            height: auto;
+        }
+
+        .error-message
+        {
+            margin-top: 20px;
+            margin-bottom: 20px;
+
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Susanin demo page</h1>
+        <p class="lead">
+            Here you can play with match and build methods of Susanin.Route instance
+        </p>
+        <textarea id="route-options-textarea">
+// At first specify the options for creating instance
+// var route = new Susanin.Route(%options%);
+// {String} options.pattern
+// {Object} [options.conditions]
+// {Object} [options.defaults]
+// {Object} [options.data]
+
+{
+    pattern : '/&lt;controller&gt;(/&lt;action&gt;(/&lt;id&gt;))'
+}
+        </textarea>
+        <div id="route-options-error" class="error-message"></div>
+        <textarea id="match-options-textarea">
+// Then define match object. It can be object or string.
+
+'/products/jeans/levis'
+        </textarea>
+        <div id="match-options-error" class="error-message"></div>
+        <textarea id="match-result-textarea"></textarea>
+    </div>
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="susanin.min.js"></script>
+    <script src="codemirror-3.14/lib/codemirror.js"></script>
+    <script src="codemirror-3.14/mode/javascript/javascript.js"></script>
+    <script src="codemirror-3.14/addon/edit/matchbrackets.js"></script>
+    <script>
+        function solve() {
+            var route,
+                routeOptions,
+                routeOptionsErrorNode = document.getElementById('route-options-error'),
+                matchOptions,
+                matchOptionsErrorNode = document.getElementById('match-options-error');
+
+            try {
+                routeOptions = eval('(' + routeOptionsEditor.getValue() + ')');
+                route = new Susanin.Route(routeOptions);
+                routeOptionsErrorNode.innerHTML = '';
+            } catch (e) {
+                routeOptionsErrorNode.innerHTML = e.toString();
+            }
+
+            if (route) {
+                matchOptionsEditor.setOption('readOnly', false);
+                try {
+                    matchOptions = eval(matchOptionsEditor.getValue());
+                    matchOptionsErrorNode.innerHTML = '';
+                } catch (e) {
+                    matchOptionsErrorNode.innerHTML = e.toString();
+                }
+
+                if (matchOptions) {
+                    matchResultEditor.setValue(JSON.stringify(route.match(matchOptions), null, 4));
+                }
+            } else {
+                matchOptionsEditor.setOption('readOnly', true);
+            }
+        }
+
+        var routeOptionsEditor = CodeMirror.fromTextArea(document.getElementById('route-options-textarea'), {
+                mode : 'javascript',
+                lineNumbers : true,
+                matchBrackets : true
+            }),
+            matchOptionsEditor = CodeMirror.fromTextArea(document.getElementById('match-options-textarea'), {
+                mode : 'javascript',
+                lineNumbers : true,
+                matchBrackets : true
+            }),
+            matchResultEditor = CodeMirror.fromTextArea(document.getElementById('match-result-textarea'), {
+                mode : 'javascript',
+                readOnly : true
+            });
+
+        routeOptionsEditor.on('change', solve);
+        matchOptionsEditor.on('change', solve);
+
+        solve();
+    </script>
+    </body>
+</html>
