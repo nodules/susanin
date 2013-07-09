@@ -11,44 +11,96 @@
         .CodeMirror
         {
             height: auto;
+
+            border: 1px solid #ddd;
+            -webkit-border-radius: 4px;
+            -moz-border-radius: 4px;
+            border-radius: 4px;
         }
 
-        .error-message
+        #route-options-error,
+        #match-options-error,
+        #build-params-error
+        {
+            display: none;
+        }
+
+        .alert-error
+        {
+            border-top: 0;
+            -webkit-border-top-left-radius: 0;
+            -moz-border-top-left-radius: 0;
+            border-top-left-radius: 0;
+            -webkit-border-top-right-radius: 4px;
+            -moz-border-top-right-radius: 4px;
+            border-top-right-radius: 0;
+            margin-top: -4px;
+            padding-top: 12px;
+        }
+
+        #unit
         {
             margin-top: 20px;
-            margin-bottom: 20px;
-
-            color: red;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Susanin demo page</h1>
+        <div class="page-header">
+            <h1>Susanin  <small>demo page</small></h1>
+        </div>
         <p class="lead">
-            Here you can play with match and build methods of Susanin.Route instance
+            Specify the options for creating instance:
         </p>
         <textarea id="route-options-textarea">
-// At first specify the options for creating instance
-// var route = new Susanin.Route(%options%);
-// {String} options.pattern
-// {Object} [options.conditions]
-// {Object} [options.defaults]
-// {Object} [options.data]
-
 {
-    pattern : '/&lt;controller&gt;(/&lt;action&gt;(/&lt;id&gt;))'
+    pattern: '/&lt;controller&gt;(/&lt;action&gt;(/&lt;id&gt;))'
 }
         </textarea>
-        <div id="route-options-error" class="error-message"></div>
-        <textarea id="match-options-textarea">
-// Then define match object. It can be object or string.
+        <div id="route-options-error" class="alert alert-error"></div>
 
+
+        <div id="unit">
+            <div class="row-fluid">
+                <div class="span6">
+                    <p class="lead">
+                        Define match object. It can be object or string:
+                    </p>
+                    <textarea id="match-options-textarea">
 '/products/jeans/levis'
-        </textarea>
-        <div id="match-options-error" class="error-message"></div>
-        <textarea id="match-result-textarea"></textarea>
+                    </textarea>
+                    <div id="match-options-error" class="alert alert-error"></div>
+                </div>
+                <div class="span6">
+                    <p class="lead">
+                        Result:
+                    </p>
+                    <textarea id="match-result-textarea"></textarea>
+                </div>
+            </div>
+            <br>
+            <div class="row-fluid">
+                <div class="span6">
+                    <p class="lead">
+                        Define match object. It can be object or string.
+                    </p>
+                    <textarea id="build-params-textarea">
+{
+    constructor : 'index'
+}
+                    </textarea>
+                </div>
+                <div class="span6">
+                    <p class="lead">
+                        Result:
+                    </p>
+                    <div id="build-params-error" class="alert alert-error"></div>
+                    <textarea id="build-result-textarea"></textarea>
+                </div>
+            </div>
+        </div>
     </div>
+
     <script src="http://code.jquery.com/jquery.js"></script>
     <script src="bootstrap/js/bootstrap.min.js"></script>
     <script src="susanin.min.js"></script>
@@ -56,57 +108,78 @@
     <script src="codemirror-3.14/mode/javascript/javascript.js"></script>
     <script src="codemirror-3.14/addon/edit/matchbrackets.js"></script>
     <script>
-        function solve() {
-            var route,
-                routeOptions,
-                routeOptionsErrorNode = document.getElementById('route-options-error'),
-                matchOptions,
-                matchOptionsErrorNode = document.getElementById('match-options-error');
+        (function($) {
+            function solve() {
+                var route,
+                    routeOptions,
+                    matchOptions,
+                    buildParams;
 
-            try {
-                routeOptions = eval('(' + routeOptionsEditor.getValue() + ')');
-                route = new Susanin.Route(routeOptions);
-                routeOptionsErrorNode.innerHTML = '';
-            } catch (e) {
-                routeOptionsErrorNode.innerHTML = e.toString();
-            }
+                try {
+                    routeOptions = eval('(' + routeOptionsEditor.getValue() + ')');
+                    route = new Susanin.Route(routeOptions);
+                    $routeOptionsError.slideUp();
+                    $unit.fadeIn();
+                } catch (e) {
+                    $routeOptionsError.html(e.toString()).slideDown();
+                    $unit.fadeOut();
 
-            if (route) {
-                matchOptionsEditor.setOption('readOnly', false);
+                    return;
+                }
+
                 try {
                     matchOptions = eval(matchOptionsEditor.getValue());
-                    matchOptionsErrorNode.innerHTML = '';
-                } catch (e) {
-                    matchOptionsErrorNode.innerHTML = e.toString();
-                }
-
-                if (matchOptions) {
+                    $matchOptionsError.slideUp();
                     matchResultEditor.setValue(JSON.stringify(route.match(matchOptions), null, 4));
+                } catch (e) {
+                    $matchOptionsError.html(e.toString()).slideDown();
+                    matchResultEditor.setValue('');
                 }
-            } else {
-                matchOptionsEditor.setOption('readOnly', true);
+
+                try {
+                    buildParams = eval(buildParamsEditor.getValue());
+                    $buildParamsError.slideUp();
+                    buildResultEditor.setValue(route.build(buildParams));
+                } catch (e) {
+                    $buildParamsError.html(e.toString()).slideDown();
+                    buildResultEditor.setValue('')
+                }
             }
-        }
 
-        var routeOptionsEditor = CodeMirror.fromTextArea(document.getElementById('route-options-textarea'), {
-                mode : 'javascript',
-                lineNumbers : true,
-                matchBrackets : true
-            }),
-            matchOptionsEditor = CodeMirror.fromTextArea(document.getElementById('match-options-textarea'), {
-                mode : 'javascript',
-                lineNumbers : true,
-                matchBrackets : true
-            }),
-            matchResultEditor = CodeMirror.fromTextArea(document.getElementById('match-result-textarea'), {
-                mode : 'javascript',
-                readOnly : true
-            });
+            var routeOptionsEditor = CodeMirror.fromTextArea(document.getElementById('route-options-textarea'), {
+                        mode : 'javascript',
+                        lineNumbers : true,
+                        matchBrackets : true,
+                        lineWrapping : true
+                    }),
+                    $routeOptionsError = $('#route-options-error'),
+                    matchOptionsEditor = CodeMirror.fromTextArea(document.getElementById('match-options-textarea'), {
+                        mode : 'javascript',
+                        lineNumbers : true,
+                        matchBrackets : true
+                    }),
+                    $matchOptionsError = $('#match-options-error'),
+                    matchResultEditor = CodeMirror.fromTextArea(document.getElementById('match-result-textarea'), {
+                        mode : 'javascript',
+                        readOnly : true
+                    }),
+                    buildParamsEditor = CodeMirror.fromTextArea(document.getElementById('build-params-textarea'), {
+                        mode : 'javascript',
+                        lineNumbers : true,
+                        matchBrackets : true
+                    }),
+                    $buildParamsError = $('#build-params-error'),
+                    buildResultEditor = CodeMirror.fromTextArea(document.getElementById('build-result-textarea'), {
+                        mode : 'javascript',
+                        readOnly : true
+                    }),
+                    $unit = $('#unit');
 
-        routeOptionsEditor.on('change', solve);
-        matchOptionsEditor.on('change', solve);
+            routeOptionsEditor.on('change', solve);
+            matchOptionsEditor.on('change', solve);
 
-        solve();
+            solve();
+        })(jQuery);
     </script>
     </body>
 </html>
