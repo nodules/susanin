@@ -1,7 +1,8 @@
 # Susanin [![Build Status](https://travis-ci.org/ruslankerimov/susanin.png?branch=master)](https://travis-ci.org/ruslankerimov/susanin)
 
 Susanin is a routing library which can be used in any JavaScript environments.
-[Demo](http://nodules.github.io/susanin)
+
+## [Demo](http://nodules.github.io/susanin)
 
 ## Getting Started
 
