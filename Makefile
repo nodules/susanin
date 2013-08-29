@@ -4,7 +4,7 @@ UGLIFYJS := $(BIN_PATH)uglifyjs
 NODEUNIT := $(BIN_PATH)nodeunit
 ISTANBUL := $(BIN_PATH)istanbul
 
-all: tests
+all: test
 
 test: jshint $(NODEUNIT) $(ISTANBUL)
 	$(ISTANBUL) test ./test/runner.js
