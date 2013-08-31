@@ -3,6 +3,7 @@
 <head>
     <title>Susanin — javascript router system</title>
     <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link href="css/index.min.css" rel="stylesheet">
@@ -10,36 +11,27 @@
 <body>
     <div class="container">
         <div class="page-header">
-            <h1>Susanin  <small>demo page</small></h1>
+            <h1>Susanin  <small>demo page</small><a id="permalink" class="pull-right" href="#">#</a></h1>
         </div>
-        <p class="lead">
-            Specify <a target="_blank" href="https://github.com/nodules/susanin#route">the options</a> for creating instance
-        </p>
-        <textarea id="route-options-textarea">
-{
-    pattern: '/jeans(/&lt;brand&gt;(/&lt;id&gt;))',
-    conditions: {
-        brand: [ 'levis', 'wrangler' ],
-        id: '\\d{3,5}'
-    },
-    defaults: {
-        brand: 'levis',
-    }
-}
-        </textarea>
-        <div id="route-options-error" class="alert alert-error"></div>
-
+        <div class="row">
+            <div class="col-md-12">
+                <p class="lead">
+                    Specify <a target="_blank" href="https://github.com/nodules/susanin#route">the options</a> for creating
+                    an instance
+                </p>
+                <textarea id="route-options-textarea"></textarea>
+                <div id="route-options-error" class="alert alert-danger"></div>
+            </div>
+        </div>
         <div id="unit">
             <div class="row">
                 <div class="col-md-6">
                     <p class="lead">
                         Define <a target="_blank" href="https://github.com/nodules/susanin#match">match object</a>.
-                        It must be object or string
+                        It must be an object or a string
                     </p>
-                    <textarea id="match-options-textarea">
-'/jeans/levis/1234'
-                    </textarea>
-                    <div id="match-options-error" class="alert alert-error"></div>
+                    <textarea id="match-options-textarea"></textarea>
+                    <div id="match-options-error" class="alert alert-danger"></div>
                 </div>
                 <div class="col-md-6">
                     <p class="lead">
@@ -48,19 +40,14 @@
                     <textarea id="match-result-textarea"></textarea>
                 </div>
             </div>
-            <br>
             <div class="row">
                 <div class="col-md-6">
                     <p class="lead">
                         Define <a target="_blank" href="https://github.com/nodules/susanin#build">build params</a>.
-                        It must be object
+                        It must be an object
                     </p>
-                    <textarea id="build-params-textarea">
-{
-    brand: 'levis'
-}
-                    </textarea>
-                    <div id="build-params-error" class="alert alert-error"></div>
+                    <textarea id="build-params-textarea"></textarea>
+                    <div id="build-params-error" class="alert alert-danger"></div>
                 </div>
                 <div class="col-md-6">
                     <p class="lead">
@@ -73,5 +60,5 @@
     </div>
 
     <script src="js/index.min.js"></script>
-    </body>
+</body>
 </html>

@@ -15,7 +15,7 @@ concat: get-libs $(BORSCHIK)
 
 .PHONY: get-libs
 get-libs: $(BOWER)
-	$(BOWER) install jquery codemirror bootstrap susanin
+	$(BOWER) install jquery codemirror bootstrap susanin json2
 
 $(BOWER): $(NPM)
 	$(NPM) install bower
