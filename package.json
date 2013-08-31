@@ -9,7 +9,7 @@
     "keywords" : [ "router", "routes", "routing" ],
     "repository" : {
         "type" : "git",
-        "url" : "git://github.com/ruslankerimov/susanin.git"
+        "url" : "git://github.com/nodules/susanin.git"
     },
     "scripts" : {
         "test" : "make test"
@@ -24,7 +24,7 @@
     "optionalDependencies" : {},
     "main" : "susanin",
     "bugs" : {
-        "url" : "https://github.com/ruslankerimov/susanin/issues"
+        "url" : "https://github.com/nodules/susanin/issues"
     },
     "license": "MIT"
 }
