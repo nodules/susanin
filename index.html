@@ -5,55 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link href="./codemirror-3.14/lib/codemirror.css" rel="stylesheet">
-    <style>
-        .CodeMirror
-        {
-            height: auto;
-
-            border: 1px solid #ddd;
-            -webkit-border-radius: 4px;
-            -moz-border-radius: 4px;
-            border-radius: 4px;
-        }
-
-        .CodeMirror-scroll
-        {
-            min-height: 100px;
-        }
-
-        #route-options-error,
-        #match-options-error,
-        #build-params-error
-        {
-            display: none;
-        }
-
-        .alert-error
-        {
-            border-top: 0;
-            -webkit-border-top-left-radius: 0;
-            -moz-border-top-left-radius: 0;
-            border-top-left-radius: 0;
-            -webkit-border-top-right-radius: 4px;
-            -moz-border-top-right-radius: 4px;
-            border-top-right-radius: 0;
-            margin-top: -4px;
-            padding-top: 12px;
-        }
-
-        #unit
-        {
-            margin-top: 20px;
-        }
-
-        textarea
-        {
-            width: 100%;
-            min-height: 100px;
-        }
-    </style>
+    <link href="css/_index.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
@@ -78,8 +30,8 @@
         <div id="route-options-error" class="alert alert-error"></div>
 
         <div id="unit">
-            <div class="row-fluid">
-                <div class="span6">
+            <div class="row">
+                <div class="col-md-6">
                     <p class="lead">
                         Define <a target="_blank" href="https://github.com/nodules/susanin#match">match object</a>.
                         It must be object or string
@@ -89,7 +41,7 @@
                     </textarea>
                     <div id="match-options-error" class="alert alert-error"></div>
                 </div>
-                <div class="span6">
+                <div class="col-md-6">
                     <p class="lead">
                         Result
                     </p>
@@ -97,8 +49,8 @@
                 </div>
             </div>
             <br>
-            <div class="row-fluid">
-                <div class="span6">
+            <div class="row">
+                <div class="col-md-6">
                     <p class="lead">
                         Define <a target="_blank" href="https://github.com/nodules/susanin#build">build params</a>.
                         It must be object
@@ -110,7 +62,7 @@
                     </textarea>
                     <div id="build-params-error" class="alert alert-error"></div>
                 </div>
-                <div class="span6">
+                <div class="col-md-6">
                     <p class="lead">
                         Result
                     </p>
@@ -120,86 +72,6 @@
         </div>
     </div>
 
-    <script src="http://code.jquery.com/jquery.js"></script>
-    <script src="bootstrap/js/bootstrap.min.js"></script>
-    <script src="susanin.min.js"></script>
-    <script src="codemirror-3.14/lib/codemirror.js"></script>
-    <script src="codemirror-3.14/mode/javascript/javascript.js"></script>
-    <script src="codemirror-3.14/addon/edit/matchbrackets.js"></script>
-    <script>
-        (function($) {
-            function solve() {
-                var route,
-                    routeOptions,
-                    matchOptions,
-                    buildParams;
-
-                try {
-                    routeOptions = eval('(' + routeOptionsEditor.getValue() + ')');
-                    route = new Susanin.Route(routeOptions);
-                    $routeOptionsError.slideUp();
-                    $unit.fadeIn();
-                } catch (e) {
-                    $routeOptionsError.html(e.toString()).slideDown();
-                    $unit.fadeOut();
-
-                    return;
-                }
-
-                try {
-                    matchOptions = eval('(' + matchOptionsEditor.getValue() + ')');
-                    $matchOptionsError.slideUp();
-                    matchResultEditor.setValue(JSON.stringify(route.match(matchOptions), null, 4));
-                } catch (e) {
-                    $matchOptionsError.html(e.toString()).slideDown();
-                    matchResultEditor.setValue('');
-                }
-
-                try {
-                    buildParams = eval('(' + buildParamsEditor.getValue() + ')');
-                    $buildParamsError.slideUp();
-                    buildResultEditor.setValue('"' + route.build(buildParams) + '"');
-                } catch (e) {
-                    $buildParamsError.html(e.toString()).slideDown();
-                    buildResultEditor.setValue('')
-                }
-            }
-
-            var routeOptionsEditor = CodeMirror.fromTextArea(document.getElementById('route-options-textarea'), {
-                    mode : 'javascript',
-                    lineNumbers : true,
-                    matchBrackets : true,
-                    lineWrapping : true
-                }),
-                $routeOptionsError = $('#route-options-error'),
-                matchOptionsEditor = CodeMirror.fromTextArea(document.getElementById('match-options-textarea'), {
-                    mode : 'javascript',
-                    lineNumbers : true,
-                    matchBrackets : true
-                }),
-                $matchOptionsError = $('#match-options-error'),
-                matchResultEditor = CodeMirror.fromTextArea(document.getElementById('match-result-textarea'), {
-                    mode : 'javascript',
-                    readOnly : true
-                }),
-                buildParamsEditor = CodeMirror.fromTextArea(document.getElementById('build-params-textarea'), {
-                    mode : 'javascript',
-                    lineNumbers : true,
-                    matchBrackets : true
-                }),
-                $buildParamsError = $('#build-params-error'),
-                buildResultEditor = CodeMirror.fromTextArea(document.getElementById('build-result-textarea'), {
-                    mode : 'javascript',
-                    readOnly : true
-                }),
-                $unit = $('#unit');
-
-            routeOptionsEditor.on('change', solve);
-            matchOptionsEditor.on('change', solve);
-            buildParamsEditor.on('change', solve);
-
-            solve();
-        })(jQuery);
-    </script>
+    <script src="js/_index.js"></script>
     </body>
 </html>
