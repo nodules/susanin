@@ -10,8 +10,8 @@ build:: concat
 
 .PHONY: concat
 concat: get-libs $(BORSCHIK)
-	$(BORSCHIK) -i js/index.js -o js/_index.js -t js -m yes
-	$(BORSCHIK) -i css/index.css -o css/_index.css -t css -m no -f yes
+	$(BORSCHIK) -i js/index.js -o js/index.min.js -t js -m yes
+	$(BORSCHIK) -i css/index.css -o css/index.min.css -t css -m yes -f yes
 
 .PHONY: get-libs
 get-libs: $(BOWER)
