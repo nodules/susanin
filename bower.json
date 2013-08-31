@@ -1,0 +1,14 @@
+{
+    "name" : "susanin",
+    "main" : "susanin.js",
+    "version" : "0.1.9",
+    "ignore" : [
+        "**/.*",
+        "Makefile",
+        "package.json",
+        "bower.json",
+        "test",
+        "pre-commit",
+        "README.md"
+    ]
+}
