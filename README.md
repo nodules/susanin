@@ -101,7 +101,7 @@ var route = Susanin.Route({
         id : '123'
     },
     conditions : {
-        category : [ 'shoes', 'jeans', 'shirt' ]
+        category : [ 'shoes', 'jeans', 'shirt' ],
         id : '\\d{3,4}'
     }
 });
