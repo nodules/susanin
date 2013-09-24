@@ -26,6 +26,6 @@ $(JSHINT) $(UGLIFYJS) $(NODEUNIT) $(ISTANBUL):
 
 hook: .git/hooks/pre-commit
 .git/hooks/pre-commit: pre-commit
-	cp $< $@
+	-ln -s  $(PWD)/$< $@
 
 .PHONY: jshint test minify hook all unittests coverage
