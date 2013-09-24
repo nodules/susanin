@@ -1,4 +1,0 @@
-#!/bin/sh -e
-
-make minify
-git add susanin.min.js

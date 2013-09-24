@@ -4,16 +4,15 @@ var Susanin = require('../../'),
 module.exports = {
 
     '/opa' : function(test) {
-        var route = Route('/opa')
-;
+        var route = Route('/opa');
 
-test.deepEqual(route.match('/opapa'), null);
+        test.deepEqual(route.match('/opapa'), null);
         test.deepEqual(route.match('/opa'), {});
         test.deepEqual(route.match('/opa?foo'), { foo : '' });
         test.deepEqual(route.match('/opa?foo=bar'), { foo : 'bar' });
         test.deepEqual(route.match('/opa?=bar'), { '' : 'bar' });
         test.deepEqual(route.match('/opa?'), {});
-        test.deepEqual(route.match('/opa?foo=bar1&foo=bar2'), { foo : [ 'bar1', 'bar2' ]});
+        test.deepEqual(route.match('/opa?foo=bar1&foo=bar2'), { foo : [ 'bar1', 'bar2' ] });
 
         test.done();
     },

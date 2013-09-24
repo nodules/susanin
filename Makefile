@@ -1,31 +1,27 @@
 BIN_PATH := ./node_modules/.bin/
 JSHINT := $(BIN_PATH)jshint
-UGLIFYJS := $(BIN_PATH)uglifyjs
+JSCS := $(BIN_PATH)jscs
 NODEUNIT := $(BIN_PATH)nodeunit
 ISTANBUL := $(BIN_PATH)istanbul
 
 all: test
 
-test: jshint $(NODEUNIT) $(ISTANBUL)
+test: jshint jscs $(NODEUNIT) $(ISTANBUL)
 	$(ISTANBUL) test ./test/runner.js
 
 unittests: $(NODEUNIT)
 	$(NODEUNIT) test/tests
 
 jshint: $(JSHINT)
-	$(JSHINT) susanin.js
+	$(JSHINT) lib test
 
-minify: $(UGLIFYJS)
-	$(UGLIFYJS) susanin.js > susanin.min.js
+jscs: $(JSCS)
+	$(JSCS) lib test
 
 coverage: $(ISTANBUL)
 	$(ISTANBUL) cover ./test/runner.js
 
-$(JSHINT) $(UGLIFYJS) $(NODEUNIT) $(ISTANBUL):
+$(JSHINT) $(NODEUNIT) $(ISTANBUL) $(JSCS):
 	npm install
 
-hook: .git/hooks/pre-commit
-.git/hooks/pre-commit: pre-commit
-	-ln -s  $(PWD)/$< $@
-
-.PHONY: jshint test minify hook all unittests coverage
+.PHONY: jshint test all unittests coverage

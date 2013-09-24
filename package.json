@@ -16,15 +16,16 @@
     },
     "dependencies" : {},
     "devDependencies" : {
-        "jshint" : "",
+        "jshint" : "2.1.10",
         "uglify-js" : "1.3.4",
-        "nodeunit" : "",
-        "istanbul" : ""
+        "nodeunit" : "*",
+        "istanbul" : "*",
+        "jscs": "1.0.5"
     },
     "optionalDependencies" : {},
-    "main" : "susanin",
+    "main" : "lib/susanin.js",
     "bugs" : {
-        "url" : "https://github.com/ruslankerimov/susanin/issues"
+        "url" : "https://github.com/nodules/susanin/issues"
     },
     "license": "MIT"
 }

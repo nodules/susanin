@@ -24,7 +24,7 @@ module.exports = {
 
     '"options" is mandatory' : function(test) {
         try {
-            var route = Route();
+            Route();
 
             test.ok(false);
         } catch (e) {
@@ -35,7 +35,7 @@ module.exports = {
 
     '"options.pattern" property is mandatory' : function(test) {
         try {
-            var route = Route({ name : 'opa' });
+            Route({ name : 'opa' });
 
             test.ok(false);
         } catch (e) {
@@ -46,7 +46,7 @@ module.exports = {
 
     '"options" can be string' : function(test) {
         try {
-            var route = Route('/opa');
+            Route('/opa');
 
             test.ok(true);
         } catch (e) {

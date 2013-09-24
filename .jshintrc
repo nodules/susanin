@@ -26,7 +26,7 @@
     "latedef" : true,
 
     // This option requires you to capitalize names of constructor functions.
-    "newcap" : true,
+    "newcap" : false,
 
     // This option prohibits the use of arguments.caller and arguments.callee.
     "noarg" : true,
