@@ -6,6 +6,7 @@
 /* borschik:include:../bower_components/codemirror/addon/edit/matchbrackets.js */
 /* borschik:include:../bower_components/json2/json2.js */
 
+
 (function($) {
     function solve() {
         var route,
