@@ -1,6 +1,6 @@
 {
     "name" : "susanin",
-    "main" : "susanin.js",
+    "main" : "./lib/susanin.js",
     "version" : "0.1.9",
     "ignore" : [
         "**/.*",
