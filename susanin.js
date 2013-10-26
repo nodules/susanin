@@ -426,7 +426,7 @@
         if (typeof matchObject === 'string') {
             matchObject = { path : matchObject };
         } else if ( ! matchObject) {
-            matchObject = {};
+            return ret;
         }
 
         for (key in matchObject) {
