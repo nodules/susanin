@@ -3,6 +3,14 @@ var Susanin = require('../../'),
 
 module.exports = {
 
+    'undefined' : function(test, undefined) {
+        var route = Route('/opa');
+
+        test.deepEqual(route.match(undefined), null);
+
+        test.done();
+    },
+
     '/opa' : function(test) {
         var route = Route('/opa');
 
