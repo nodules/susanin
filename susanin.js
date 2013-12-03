@@ -134,7 +134,7 @@
     var GROUP_CLOSED_CHAR = ')';
 
     var PARAM_NAME_REGEXP_SOURCE = '[a-zA-Z_][\\w\\-]*';
-    var PARAM_VALUE_REGEXP_SOURCE = '[\\w\\-]+';
+    var PARAM_VALUE_REGEXP_SOURCE = '[\\w\\-\\.]+';
 
     var PARSE_PARAMS_REGEXP =
         new RegExp(
