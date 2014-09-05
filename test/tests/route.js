@@ -1,5 +1,4 @@
-var Susanin = require('../../'),
-    Route = Susanin.Route;
+var Route = require('../router').Route;
 
 module.exports = {
 

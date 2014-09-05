@@ -1,17 +1,17 @@
-var Susanin = require('../../');
+var Router = require('../router');
 
 module.exports = {
 
     setUp : function(callback) {
-        var susanin = this.susanin = Susanin();
+        var router = this.router = Router();
 
-        susanin
+        router
             .addRoute({
                 name : 'first',
                 pattern : '/first'
             });
 
-        susanin
+        router
             .addRoute({
                 name : 'second',
                 pattern : '/first(/<param>)',
@@ -20,7 +20,7 @@ module.exports = {
                 }
             });
 
-        susanin.addRoute({
+        router.addRoute({
             name : 'third',
             pattern : '/first',
             data : {
@@ -28,7 +28,7 @@ module.exports = {
             }
         });
 
-        susanin.addRoute({
+        router.addRoute({
             name : 'fourth',
             pattern : '/fourth'
         });
@@ -37,28 +37,28 @@ module.exports = {
     },
 
     '"findFirst" method' : function(test) {
-        var finded = this.susanin.findFirst('/first');
+        var finded = this.router.findFirst('/first');
 
-        test.strictEqual(finded[0], this.susanin.getRouteByName('first'));
+        test.strictEqual(finded[0], this.router.getRouteByName('first'));
         test.deepEqual(finded[1], {});
-        test.strictEqual(this.susanin.findFirst({ path : '/first', method : 'post' })[0], this.susanin.getRouteByName('third'));
-        test.strictEqual(this.susanin.findFirst('/f'), null);
+        test.strictEqual(this.router.findFirst({ path : '/first', method : 'post' })[0], this.router.getRouteByName('third'));
+        test.strictEqual(this.router.findFirst('/f'), null);
 
         test.done();
     },
 
     '"find" method' : function(test) {
-        var finded = this.susanin.find('/first');
+        var finded = this.router.find('/first');
 
         test.strictEqual(finded.length, 3);
-        test.strictEqual(finded[0][0], this.susanin.getRouteByName('first'));
-        test.strictEqual(finded[1][0], this.susanin.getRouteByName('second'));
-        test.strictEqual(finded[2][0], this.susanin.getRouteByName('third'));
+        test.strictEqual(finded[0][0], this.router.getRouteByName('first'));
+        test.strictEqual(finded[1][0], this.router.getRouteByName('second'));
+        test.strictEqual(finded[2][0], this.router.getRouteByName('third'));
         test.deepEqual(finded[0][1], {});
         test.deepEqual(finded[1][1], {});
         test.deepEqual(finded[2][1], {});
-        test.strictEqual(this.susanin.find({ path : '/first', method : 'post' })[0][0], this.susanin.getRouteByName('third'));
-        test.deepEqual(this.susanin.find('/f'), []);
+        test.strictEqual(this.router.find({ path : '/first', method : 'post' })[0][0], this.router.getRouteByName('third'));
+        test.deepEqual(this.router.find('/f'), []);
 
         test.done();
     }

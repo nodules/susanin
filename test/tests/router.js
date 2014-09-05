@@ -1,23 +1,23 @@
-var Susanin = require('../../');
+var Router = require('../router');
 
 module.exports = {
 
-    '"Susanin" must be function' : function(test) {
-        test.ok(typeof Susanin === 'function');
+    '"Router" must be function' : function(test) {
+        test.ok(typeof Router === 'function');
         test.done();
     },
 
-    '"Susanin" must be constructor' : function(test) {
-        var susanin = new Susanin();
+    '"Router" must be constructor' : function(test) {
+        var router = new Router();
 
-        test.ok(susanin instanceof Susanin);
+        test.ok(router instanceof Router);
         test.done();
     },
 
-    '"Susanin" can be called without "new"' : function(test) {
-        var susanin = Susanin();
+    '"Router" can be called without "new"' : function(test) {
+        var router = Router();
 
-        test.ok(susanin instanceof Susanin);
+        test.ok(router instanceof Router);
         test.done();
     }
 

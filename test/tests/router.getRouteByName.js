@@ -1,15 +1,15 @@
-var Susanin = require('../../');
+var Router = require('../router');
 
 module.exports = {
 
     '"getRouteByName" must return right instance of "Route"' : function(test) {
-        var susanin = Susanin(),
-            routeFoo = susanin.addRoute({ pattern : '/foo', data : { name : 'foo' } }),
-            routeBar = susanin.addRoute({ pattern : '/bar', data : { name : 'bar' } });
+        var router = Router(),
+            routeFoo = router.addRoute({ pattern : '/foo', data : { name : 'foo' } }),
+            routeBar = router.addRoute({ pattern : '/bar', data : { name : 'bar' } });
 
-        test.strictEqual(susanin.getRouteByName('bar'), routeBar);
-        test.strictEqual(susanin.getRouteByName('foo'), routeFoo);
-        test.strictEqual(susanin.getRouteByName('opa'), null);
+        test.strictEqual(router.getRouteByName('bar'), routeBar);
+        test.strictEqual(router.getRouteByName('foo'), routeFoo);
+        test.strictEqual(router.getRouteByName('opa'), null);
 
         test.done();
     }

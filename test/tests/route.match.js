@@ -1,9 +1,8 @@
-var Susanin = require('../../'),
-    Route = Susanin.Route;
+var Route = require('../router').Route;
 
 module.exports = {
 
-    'undefined' : function(test, undefined) {
+    undefined : function(test, undefined) {
         var route = Route('/opa');
 
         test.deepEqual(route.match(undefined), null);

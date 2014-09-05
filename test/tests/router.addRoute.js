@@ -1,14 +1,15 @@
-var Susanin = require('../../');
+var Router = require('../router'),
+    Route = Router.Route;
 
 module.exports = {
 
-    'Instance of "Susanin" must have function "addRoute"' : function(test) {
-        test.ok(typeof Susanin().addRoute === 'function');
+    'Instance of "Router" must have function "addRoute"' : function(test) {
+        test.ok(typeof Router().addRoute === 'function');
         test.done();
     },
 
-    '"addRoute" must return instance of Susanin.Route' : function(test) {
-        test.ok(Susanin().addRoute({ name : 'first', pattern : '/opa' }) instanceof Susanin.Route);
+    '"addRoute" must return instance of Route' : function(test) {
+        test.ok(Router().addRoute({ name : 'first', pattern : '/opa' }) instanceof Route);
         test.done();
     }
 

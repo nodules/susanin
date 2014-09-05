@@ -1,5 +1,4 @@
-var Susanin = require('../../'),
-    Route = Susanin.Route;
+var Route = require('../router').Route;
 
 module.exports = {
 
@@ -21,10 +20,9 @@ module.exports = {
     },
 
     '/opa/<param>' : function(test) {
-        var route = Route('/opa/<param>')
-;
+        var route = Route('/opa/<param>');
 
-test.strictEqual(route.build(), '/opa/');
+        test.strictEqual(route.build(), '/opa/');
         test.strictEqual(route.build({}), '/opa/');
         test.strictEqual(route.build({ param : 'bar' }), '/opa/bar');
         test.strictEqual(route.build({ param : [ 'bar1', 'bar2' ] }), '/opa/bar1,bar2');
