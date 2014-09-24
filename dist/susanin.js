@@ -49,9 +49,7 @@ var querystring = {
             tmp, value, key,
             i, size;
 
-        arguments.length || (query = location.search.substr(1));
-
-        if ( ! query) {
+        if (typeof query !== 'string' || query === '') {
             return params;
         }
 
@@ -653,6 +651,10 @@ Router.prototype.getRouteByName = function(name) {
     return this._routesByName[name] || null;
 };
 
+/**
+ * @static
+ * @type {Route}
+ */
 Router.Route = Route;
 
 module.exports = Router;

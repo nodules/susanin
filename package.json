@@ -17,15 +17,16 @@
     "dependencies" : {},
     "devDependencies" : {
         "jshint" : "2.1.10",
-        "nodeunit" : "*",
-        "istanbul" : "*",
         "jscs" : "1.0.5",
-        "borschik" : "*"
+        "istanbul" : "0.1.x",
+        "mocha" : "1.11.x",
+        "chai" : "1.7.x",
+        "borschik" : "0.3.x"
     },
     "optionalDependencies" : {},
     "main" : "lib/router.js",
     "bugs" : {
         "url" : "https://github.com/nodules/susanin/issues"
     },
-    "license": "MIT"
+    "license" : "MIT"
 }
