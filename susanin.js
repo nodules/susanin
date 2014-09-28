@@ -453,12 +453,6 @@
                     }
                 }
 
-                for (key in this._defaults) {
-                    if (hasOwnProp.call(this._defaults, key) && ! hasOwnProp.call(ret, key)) {
-                        ret[key] = this._defaults[key];
-                    }
-                }
-
                 queryParams = querystring.parse(ret.query_string);
                 for (key in queryParams) {
                     if (hasOwnProp.call(queryParams, key) && ! hasOwnProp.call(ret, key)) {
@@ -466,6 +460,12 @@
                     }
                 }
                 delete ret.query_string;
+
+                for (key in this._defaults) {
+                    if (hasOwnProp.call(this._defaults, key) && ! hasOwnProp.call(ret, key)) {
+                        ret[key] = this._defaults[key];
+                    }
+                }
             }
         } else {
             ret = {};
