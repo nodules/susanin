@@ -147,7 +147,7 @@ module.exports = {
         test.deepEqual(route.match('/opa/opapa/'), null);
         test.deepEqual(route.match('/opa/opapa/value2'), { param : 'value2' });
         test.deepEqual(route.match('/opa/opapa/value2?param=value3&foo1=bar1&foo1=bar2&foo2=&=bar3'),
-            { param : 'value2', foo1 : [ 'bar1', 'bar2' ], foo2 : '', '' : 'bar3' });
+            { param : [ 'value2', 'value3' ], foo1 : [ 'bar1', 'bar2' ], foo2 : '', '' : 'bar3' });
 
         test.done();
     },
@@ -173,7 +173,7 @@ module.exports = {
         test.deepEqual(route.match('/opa?param=value3&foo1=bar1&foo1=bar2&foo2=&=bar3'),
             { param : 'value3', foo1 : [ 'bar1', 'bar2' ], foo2 : '', '' : 'bar3' });
         test.deepEqual(route.match('/opa/opapa/value2?param=value3&foo1=bar1&foo1=bar2&foo2=&=bar3'),
-            { param : 'value2', foo1 : [ 'bar1', 'bar2' ], foo2 : '', '' : 'bar3' });
+            { param : [ 'value2', 'value3' ], foo1 : [ 'bar1', 'bar2' ], foo2 : '', '' : 'bar3' });
 
         test.done();
     },

@@ -455,8 +455,13 @@
 
                 queryParams = querystring.parse(ret.query_string);
                 for (key in queryParams) {
-                    if (hasOwnProp.call(queryParams, key) && ! hasOwnProp.call(ret, key)) {
-                        ret[key] = queryParams[key];
+                    if (hasOwnProp.call(queryParams, key)) {
+                        if ( ! hasOwnProp.call(ret, key)) {
+                            ret[key] = queryParams[key];
+                        } else {
+                            // assumes that matched params never have multiple values (array)
+                            ret[key] = [ ret[key] ].concat(queryParams[key]);
+                        }
                     }
                 }
                 delete ret.query_string;
