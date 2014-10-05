@@ -133,6 +133,9 @@ module.exports = querystring;
 
                 /* ../lib/route.js begin */
 var hasOwnProp = Object.prototype.hasOwnProperty,
+    has = function(ctx, name) {
+        return hasOwnProp.call(ctx, name);
+    },
     toString = Object.prototype.toString,
     isArray = function(subject) {
         return toString.call(subject) === '[object Array]';
@@ -199,27 +202,33 @@ function Route(options) {
     if (typeof options.pattern !== 'string') {
         throw new Error('You must specify the pattern of the route');
     }
-    this._pattern = options.pattern;
 
-    this._conditions = options.conditions && typeof options.conditions === 'object' ? options.conditions : {};
-    this._defaults = options.defaults && typeof options.defaults === 'object' ? options.defaults : {};
-    this._data = options.data && typeof options.data === 'object' ? options.data : {};
-    typeof options.name === 'string' && (this._data.name = options.name);
+    /**
+     * @type {RouteOptions}
+     * @private
+     */
+    this._options = options;
 
-    typeof options.filterMatch === 'function' && (this._filterMatch = options.filterMatch);
-    typeof options.filterBuild === 'function' && (this._filterBuild = options.filterBuild);
+    options.conditions && typeof options.conditions === 'object' || (options.conditions = {});
+    options.defaults && typeof options.defaults === 'object' || (options.defaults = {});
+    options.data && typeof options.data === 'object' || (options.data = {});
+    typeof options.name === 'string' && (options.data.name = options.name);
 
     /* query_string */
-    this._pattern += GROUP_OPENED_CHAR +
+    options.pattern += GROUP_OPENED_CHAR +
         '?' + PARAM_OPENED_CHAR + 'query_string' + PARAM_CLOSED_CHAR +
         GROUP_CLOSED_CHAR;
-    this._conditions.query_string = '.*';
+    options.conditions.query_string = '.*';
     /* /query_string */
 
-    this._parts = this._parsePattern(this._pattern);
-    this
-        ._buildParseRegExp()
-        ._buildBuildFn();
+    /**
+     * @type {Array}
+     * @private
+     */
+    this._parts = this._parsePattern(options.pattern);
+
+    this._buildParseRegExp();
+    this._buildBuildFn();
 }
 
 /**
@@ -313,15 +322,12 @@ Route.prototype._parseParams = function(pattern, parts) {
 };
 
 /**
- * @returns {Route}
  * @private
  */
 Route.prototype._buildParseRegExp = function() {
     this._paramsMap = [];
     this._parseRegExpSource = '^' + this._buildParseRegExpParts(this._parts) + '$';
     this._parseRegExp = new RegExp(this._parseRegExpSource);
-
-    return this;
 };
 
 /**
@@ -357,7 +363,7 @@ Route.prototype._buildParseRegExpParts = function(parts) {
  */
 Route.prototype._buildParamValueRegExpSource = function(paramName) {
     var ret,
-        condition = this._conditions[paramName];
+        condition = this._options.conditions[paramName];
 
     if (condition) {
         if (isArray(condition)) {
@@ -373,15 +379,12 @@ Route.prototype._buildParamValueRegExpSource = function(paramName) {
 };
 
 /**
- * @returns {Route}
  * @private
  */
 Route.prototype._buildBuildFn = function() {
     this._buildFnSource = 'var h=({}).hasOwnProperty;return ' + this._buildBuildFnParts(this._parts) + ';';
     /*jshint evil:true */
     this._buildFn = new Function('p', this._buildFnSource);
-
-    return this;
 };
 
 /**
@@ -392,7 +395,8 @@ Route.prototype._buildBuildFn = function() {
 Route.prototype._buildBuildFnParts = function(parts) {
     var ret = '""',
         i, sizeI, j, sizeJ,
-        part, name;
+        part, name,
+        defaults = this._options.defaults;
 
     for (i = 0, sizeI = parts.length; i < sizeI; ++i) {
         part = parts[i];
@@ -402,8 +406,8 @@ Route.prototype._buildBuildFnParts = function(parts) {
         } else if (part && part.what === 'param') {
             ret += '+(h.call(p,"' + escape(part.name) + '")?' +
                 'p["' + escape(part.name) + '"]:' +
-                (this._defaults && hasOwnProp.call(this._defaults, part.name) ?
-                 '"' + escape(this._defaults[part.name]) +  '"' :
+                (has(defaults, part.name) ?
+                 '"' + escape(defaults[part.name]) +  '"' :
                  '""') +
                 ')';
         } else if (part && part.what === 'optional') {
@@ -413,9 +417,9 @@ Route.prototype._buildBuildFnParts = function(parts) {
                 name = part.dependOnParams[j];
 
                 ret += '||(h.call(p,"' + escape(name) + '")' +
-                    (this._defaults && hasOwnProp.call(this._defaults, name) ?
+                    (has(defaults, name) ?
                      '&&p["' + escape(name) + '"]!=="' +
-                         escape(this._defaults[name]) + '"' :
+                         escape(defaults[name]) + '"' :
                      '') +
                     ')';
             }
@@ -438,7 +442,9 @@ Route.prototype.match = function(matchObject) {
         i, size,
         key,
         queryParams,
-        filter = this._filterMatch;
+        options = this._options,
+        filter = options.postMatch,
+        defaults = options.defaults;
 
     if (typeof matchObject === 'string') {
         matchObject = { path : matchObject };
@@ -447,8 +453,8 @@ Route.prototype.match = function(matchObject) {
     }
 
     for (key in matchObject) {
-        if (hasOwnProp.call(matchObject, key) && key !== 'path') {
-            if (this._data[key] !== matchObject[key]) {
+        if (has(matchObject, key) && key !== 'path') {
+            if (options.data[key] !== matchObject[key]) {
                 return ret;
             }
         }
@@ -470,15 +476,15 @@ Route.prototype.match = function(matchObject) {
                 }
             }
 
-            for (key in this._defaults) {
-                if (hasOwnProp.call(this._defaults, key) && ! hasOwnProp.call(ret, key)) {
-                    ret[key] = this._defaults[key];
+            for (key in defaults) {
+                if (has(defaults, key) && ! has(ret, key)) {
+                    ret[key] = defaults[key];
                 }
             }
 
             queryParams = querystring.parse(ret.query_string);
             for (key in queryParams) {
-                if (hasOwnProp.call(queryParams, key) && ! hasOwnProp.call(ret, key)) {
+                if (has(queryParams, key) && ! has(ret, key)) {
                     ret[key] = queryParams[key];
                 }
             }
@@ -507,7 +513,7 @@ Route.prototype.build = function(params) {
         key,
         isMainParam,
         i, size,
-        filter = this._filterBuild;
+        filter = this._options.preBuild;
 
     if (filter) {
         params = filter(params);
@@ -515,7 +521,7 @@ Route.prototype.build = function(params) {
 
     for (key in params) {
         if (
-            hasOwnProp.call(params, key) &&
+            has(params, key) &&
                 params[key] !== null &&
                 typeof params[key] !== 'undefined'
             ) {
@@ -546,15 +552,15 @@ Route.prototype.build = function(params) {
  * @returns {*}
  */
 Route.prototype.getData = function() {
-    return this._data;
+    return this._options.data;
 };
 
 /**
  * Returns name of the route
- * @returns {*}
+ * @returns {?String}
  */
 Route.prototype.getName = function() {
-    return this._data.name;
+    return this._options.data.name;
 };
 
 module.exports = Route;

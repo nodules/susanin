@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-# file will be copied in ./.git/hooks directory
+# This file will be copied in ./.git/hooks directory
 PRJ_DIR=$(readlink -f $(dirname $0)/../..)/
 
 make -f "${PRJ_DIR}Makefile"

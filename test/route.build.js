@@ -36,6 +36,32 @@ module.exports = {
         done();
     },
 
+    '/opa/<param> with preBuild function' : function(done) {
+        var route = Route({
+            pattern : '/opa/<param>',
+            preBuild : function(params) {
+                if (params) {
+                    params.foo = 'bar';
+                }
+
+                if (params && params.param === 'value1') {
+                    return {
+                        param : 'value2'
+                    };
+                }
+
+                return params;
+            }
+        });
+
+        assert.deepEqual(route.build(), '/opa/');
+        assert.deepEqual(route.build({ param : 'value' }), '/opa/value?foo=bar');
+        assert.deepEqual(route.build({ param : 'value1' }), '/opa/value2');
+        assert.deepEqual(route.build({ param : 'value', foo : 'bar1' }), '/opa/value?foo=bar');
+
+        done();
+    },
+
     '/opa/<param' : function(done) {
         var route = Route('/opa/<param');
 
