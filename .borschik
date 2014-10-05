@@ -1,5 +1,0 @@
-{
-    "freeze_paths" : {
-        "./" : "./freeze/"
-    }
-}

@@ -1,5 +1,5 @@
-@import "../bower_components/bootstrap/dist/css/bootstrap.css";
-@import "../bower_components/codemirror/lib/codemirror.css";
+@import "../libs/bootstrap/dist/css/bootstrap.css";
+@import "../libs/codemirror/lib/codemirror.css";
 
 .CodeMirror
 {
@@ -58,4 +58,10 @@ textarea
 .row
 {
     margin-top: 40px;
+}
+
+#version
+{
+    width: auto;
+    margin-right: 10px;
 }

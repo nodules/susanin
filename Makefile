@@ -1,27 +1,35 @@
-BIN_PATH = ./node_modules/.bin/
-BOWER = $(BIN_PATH)bower
-BORSCHIK = $(BIN_PATH)borschik
+PRJ_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))/
+
+BIN_DIR := $(PRJ_DIR)node_modules/.bin/
+BOWER = $(BIN_DIR)bower
+JSHINT = $(BIN_DIR)jshint
+JSCS = $(BIN_DIR)jscs
+BORSCHIK = $(BIN_DIR)borschik
 NPM = /usr/bin/npm
 
-all: build
+DIRS_FOR_LINT := $(PRJ_DIR)js/index.js
+
+all: test build
+
+.PHONY: test
+test: jshint jscs
+
+.PHONY: jshint
+jshint: $(JSHINT)
+	$(JSHINT) $(DIRS_FOR_LINT)
+
+.PHONY: jscs
+jscs: $(JSCS)
+	$(JSCS) $(DIRS_FOR_LINT)
+
+.PHONY: libs
+libs: $(BOWER)
+	$(BOWER) install
 
 .PHONY: build
-build:: concat
-
-.PHONY: concat
-concat: get-libs $(BORSCHIK)
+build: $(BORSCHIK) libs
 	$(BORSCHIK) -i js/index.js -o js/index.min.js -t js -m yes
-	$(BORSCHIK) -i css/index.css -o css/index.min.css -t css -m yes -f yes
+	$(BORSCHIK) -i css/index.css -o css/index.min.css -t css -m yes -f no
 
-.PHONY: get-libs
-get-libs: $(BOWER)
-	$(BOWER) install jquery codemirror bootstrap susanin json2
-
-$(BOWER): $(NPM)
-	$(NPM) install bower
-
-$(BORSCHIK): $(NPM)
-	$(NPM) install borschik
-
-$(NPM):
-	sudo apt-get install npm
+$(BOWER) $(BORSCHIK) $(JSHINT) $(JSCS):
+	npm install

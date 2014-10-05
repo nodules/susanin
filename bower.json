@@ -1,0 +1,14 @@
+{
+    "name" : "susanin-demo",
+    "private" : true,
+    "dependencies" : {
+        "jquery" : "1.11.1",
+        "codemirror" : "4.6.0",
+        "bootstrap" : "3.2.0",
+        "json2" : "master",
+        "susanin_0.1.9" : "susanin#0.1.9",
+        "susanin_0.1.10" : "susanin#0.1.10",
+        "susanin_0.1.11" : "susanin#0.1.11",
+        "susanin_1.0.0-alpha" : "susanin#1.0.0-alpha"
+    }
+}
