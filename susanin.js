@@ -665,7 +665,18 @@
     Router.Route = Route;
 
     if (typeof module !== 'undefined' && typeof module.exports === 'object') {
+        // CommonJS, just export
         module.exports = Router;
+    } else if (typeof global.define === 'function' && global.define.amd) {
+        // AMD support
+        global.define(function () {
+            return Router;
+        });
+    } else if (typeof global.modules === 'object' && global.modules.define && global.modules.require) {
+        // YModules support
+        global.modules.define('susanin', function (provide) {
+            provide(Router);
+        });
     } else {
         global.Susanin = Router;
     }
