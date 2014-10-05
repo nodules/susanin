@@ -57,29 +57,6 @@ module.exports = {
         done();
     },
 
-    '/opa/<param> with postMatch function' : function(done) {
-        var route = Route({
-            pattern : '/opa/<param>',
-            postMatch : function(params) {
-                params.foo = 'bar';
-
-                if (params.param === 'value1') {
-                    return null;
-                }
-
-                return params;
-            }
-        });
-
-        assert.deepEqual(route.match('/opa'), null);
-        assert.deepEqual(route.match('/opa/value'), { param : 'value', foo : 'bar' });
-        assert.deepEqual(route.match('/opa/value1'), null);
-        assert.deepEqual(route.match('/opa/value?foo=bar1&foo1=bar2'),
-            { param : 'value', foo1 : 'bar2', foo : 'bar' });
-
-        done();
-    },
-
     '/opa/<param> with defaults' : function(done) {
         var route = Route({
             pattern : '/opa/<param>',
