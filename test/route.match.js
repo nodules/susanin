@@ -3,7 +3,7 @@ var Route = require('./lib/router').Route,
 
 module.exports = {
 
-    undefined : function(done) {
+    'route.match(undefined)' : function(done) {
         var route = Route('/opa'),
             undef;
 
@@ -12,7 +12,7 @@ module.exports = {
         done();
     },
 
-    '/opa' : function(done) {
+    'route.match() with /opa' : function(done) {
         var route = Route('/opa');
 
         assert.deepEqual(route.match('/opapa'), null);
@@ -26,7 +26,7 @@ module.exports = {
         done();
     },
 
-    '/opa with defaults' : function(done) {
+    'route.match() with /opa with defaults' : function(done) {
         var route = Route({
             pattern : '/opa',
             defaults : {
@@ -42,7 +42,7 @@ module.exports = {
         done();
     },
 
-    '/opa/<param>' : function(done) {
+    'route.match() with /opa/<param>' : function(done) {
         var route = Route({
             pattern : '/opa/<param>'
         });
@@ -57,7 +57,7 @@ module.exports = {
         done();
     },
 
-    '/opa/<param> with defaults' : function(done) {
+    'route.match() with /opa/<param> and defaults' : function(done) {
         var route = Route({
             pattern : '/opa/<param>',
             defaults : {
@@ -76,7 +76,7 @@ module.exports = {
         done();
     },
 
-    '/opa/<param> with conditions like array' : function(done) {
+    'route.match() with /opa/<param> and conditions like array' : function(done) {
         var route = Route({
             pattern : '/opa/<param>',
             conditions : {
@@ -95,7 +95,7 @@ module.exports = {
         done();
     },
 
-    '/opa/<param> with conditions like RegExp' : function(done) {
+    'route.match() with /opa/<param> and conditions like RegExp' : function(done) {
         var route = Route({
             pattern : '/opa/<param>',
             conditions : {
@@ -116,13 +116,13 @@ module.exports = {
         done();
     },
 
-    '/opa(/opapa/<param>)' : function(done) {
+    'route.match() with /opa(/opapa/<param>)' : function(done) {
         var route = Route({
             pattern : '/opa(/opapa/<param>)'
         });
 
         assert.deepEqual(route.match('/opapa'), null);
-        assert.deepEqual(route.match('/opa/'), null);
+        assert.deepEqual(route.match('/opa/'), {});
         assert.deepEqual(route.match('/opa'), {});
         assert.deepEqual(route.match('/opa/value'), null);
         assert.deepEqual(route.match('/opa/opapa/'), null);
@@ -133,7 +133,7 @@ module.exports = {
         done();
     },
 
-    '/opa(/opapa/<param>) with defaults' : function(done) {
+    'route.match() with /opa(/opapa/<param>) and defaults' : function(done) {
         var route = Route({
             pattern : '/opa(/opapa/<param>)',
             defaults : {
@@ -142,7 +142,7 @@ module.exports = {
         });
 
         assert.deepEqual(route.match('/opapa'), null);
-        assert.deepEqual(route.match('/opa/'), null);
+        assert.deepEqual(route.match('/opa/'), { param : 'value' });
         assert.deepEqual(route.match('/opa'), { param : 'value' });
         assert.deepEqual(route.match('/opa/value'), null);
         assert.deepEqual(route.match('/opa/opapa/'), null);
@@ -153,7 +153,7 @@ module.exports = {
         done();
     },
 
-    '/opa(/opapa/<param>) with conditions and defaults' : function(done) {
+    'route.match() with /opa(/opapa/<param>), conditions and defaults' : function(done) {
         var route = Route({
             pattern : '/opa(/opapa/<param>)',
             conditions : {
@@ -165,7 +165,7 @@ module.exports = {
         });
 
         assert.deepEqual(route.match('/opapa'), null);
-        assert.deepEqual(route.match('/opa/'), null);
+        assert.deepEqual(route.match('/opa/'), { param : 'value1' });
         assert.deepEqual(route.match('/opa'), { param : 'value1' });
         assert.deepEqual(route.match('/opa/value'), null);
         assert.deepEqual(route.match('/opa/opapa/'), null);
@@ -179,7 +179,7 @@ module.exports = {
         done();
     },
 
-    '/opa/<param1>(/opapa/<param2>(/<param3>))(/)' : function(done) {
+    'route.match() with /opa/<param1>(/opapa/<param2>(/<param3>))(/)' : function(done) {
         var route = Route({
             pattern : '/opa/<param1>(/opapa/<param2>(/<param3>))(/)',
             conditions : {

@@ -152,6 +152,8 @@ var escape = (function() {
     };
 })();
 
+var EXPANDO = String(Math.random()).substr(2, 5);
+
 var PARAM_OPENED_CHAR = '<';
 var PARAM_CLOSED_CHAR = '>';
 
@@ -171,6 +173,12 @@ var PARSE_PARAMS_REGEXP =
             escape(PARAM_CLOSED_CHAR) +
             ')',
         'g');
+
+var TRAILING_SLASH_PARAM_NAME = 'ts_' + EXPANDO;
+var TRAILING_SLASH_PARAM_VALUE = '/';
+var TRAILING_SLASH_PARAM_VALUE_ESCAPED = escape('/');
+
+var QUERY_STRING_PARAM_NAME = 'qs_' + EXPANDO;
 
 /**
  * @typedef {Object|String} RouteOptions If it's a string it means pattern for path match
@@ -214,11 +222,18 @@ function Route(options) {
     options.data && typeof options.data === 'object' || (options.data = {});
     typeof options.name === 'string' && (options.data.name = options.name);
 
+    if (options.isTrailingSlashOptional !== false) {
+        options.pattern += GROUP_OPENED_CHAR + PARAM_OPENED_CHAR +
+            TRAILING_SLASH_PARAM_NAME +
+            PARAM_CLOSED_CHAR + GROUP_CLOSED_CHAR;
+        options.conditions[TRAILING_SLASH_PARAM_NAME] = TRAILING_SLASH_PARAM_VALUE_ESCAPED;
+    }
+
     /* query_string */
     options.pattern += GROUP_OPENED_CHAR +
-        '?' + PARAM_OPENED_CHAR + 'query_string' + PARAM_CLOSED_CHAR +
+        '?' + PARAM_OPENED_CHAR + QUERY_STRING_PARAM_NAME + PARAM_CLOSED_CHAR +
         GROUP_CLOSED_CHAR;
-    options.conditions.query_string = '.*';
+    options.conditions[QUERY_STRING_PARAM_NAME] = '.*';
     /* /query_string */
 
     /**
@@ -438,6 +453,7 @@ Route.prototype._buildBuildFnParts = function(parts) {
  */
 Route.prototype.match = function(matchObject) {
     var ret = null,
+        paramName,
         matches,
         i, size,
         key,
@@ -467,11 +483,14 @@ Route.prototype.match = function(matchObject) {
             ret = {};
 
             for (i = 1, size = matches.length; i < size; ++i) {
-                if (typeof matches[i] !== 'undefined') {
-
-                    // IE lt 9
-                    if (matches[i] !== '') {
-                        ret[this._paramsMap[i - 1]] = matches[i];
+                if (typeof matches[i] !== 'undefined' && /* for IE lt 9*/ matches[i] !== '') {
+                    paramName = this._paramsMap[i - 1];
+                    if (paramName !== TRAILING_SLASH_PARAM_NAME) {
+                        ret[paramName] = matches[i];
+                    } else if (
+                        matchObject.path.charAt(matchObject.path.length - 2) === TRAILING_SLASH_PARAM_VALUE
+                    ) {
+                        return null;
                     }
                 }
             }
@@ -482,13 +501,13 @@ Route.prototype.match = function(matchObject) {
                 }
             }
 
-            queryParams = querystring.parse(ret.query_string);
+            queryParams = querystring.parse(ret[QUERY_STRING_PARAM_NAME]);
             for (key in queryParams) {
                 if (has(queryParams, key) && ! has(ret, key)) {
                     ret[key] = queryParams[key];
                 }
             }
-            delete ret.query_string;
+            delete ret[QUERY_STRING_PARAM_NAME];
         }
     } else {
         ret = {};
@@ -545,7 +564,7 @@ Route.prototype.build = function(params) {
     }
 
     queryString = querystring.stringify(queryParams);
-    queryString && (newParams.query_string = queryString);
+    queryString && (newParams[QUERY_STRING_PARAM_NAME] = queryString);
 
     return this._buildFn(newParams);
 };

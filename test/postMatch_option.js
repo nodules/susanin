@@ -3,7 +3,7 @@ var Route = require('./lib/router').Route,
 
 module.exports = {
 
-    'postMatch is not a function' : function(done) {
+    'postMatch must be a function' : function(done) {
         var route = Route({
             pattern : '/opa/<param>',
             postMatch : true

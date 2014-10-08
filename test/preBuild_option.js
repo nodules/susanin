@@ -3,7 +3,7 @@ var Route = require('./lib/router').Route,
 
 module.exports = {
 
-    'preBuild is not a function' : function(done) {
+    'preBuild must be a function' : function(done) {
         var route = Route({
             pattern : '/opa/<param>',
             preBuild : true
