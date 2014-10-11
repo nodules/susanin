@@ -1,9 +1,9 @@
-var Route = require('./lib/router').Route,
-    assert = require('chai').assert;
+/* global describe, it, Router, assert */
 
-module.exports = {
+describe('postMatch option', function() {
+    var Route = Router.Route;
 
-    'postMatch must be a function' : function(done) {
+    it('postMatch must be a function', function(done) {
         var route = Route({
             pattern : '/opa/<param>',
             postMatch : true
@@ -12,9 +12,9 @@ module.exports = {
         assert.deepEqual(route.match('/opa/value'), { param : 'value' });
 
         done();
-    },
+    });
 
-    '/opa/<param> with postMatch function' : function(done) {
+    it('/opa/<param> with postMatch function', function(done) {
         var route = Route({
             pattern : '/opa/<param>',
             postMatch : function(params) {
@@ -50,6 +50,6 @@ module.exports = {
             { param : 'value', foo1 : 'bar2', foo : 'bar' });
 
         done();
-    }
+    });
 
-};
+});

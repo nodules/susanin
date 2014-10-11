@@ -1,28 +1,27 @@
-var Router = require('./lib/router'),
-    assert = require('chai').assert;
+/* global describe, it, Router, assert */
 
-module.exports = {
+describe('Router', function() {
 
-    '`Router` must be function' : function(done) {
+    it('`Router` must be function', function(done) {
         assert.ok(typeof Router === 'function');
 
         done();
-    },
+    });
 
-    '`Router` must be constructor' : function(done) {
+    it('`Router` must be constructor', function(done) {
         var router = new Router();
 
         assert.ok(router instanceof Router);
 
         done();
-    },
+    });
 
-    '`Router` can be called without "new"' : function(done) {
+    it('`Router` can be called without "new"', function(done) {
         var router = Router();
 
         assert.ok(router instanceof Router);
 
         done();
-    }
+    });
 
-};
+});

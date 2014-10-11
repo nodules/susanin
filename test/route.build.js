@@ -1,9 +1,9 @@
-var Route = require('./lib/router').Route,
-    assert = require('chai').assert;
+/* global describe, it, Router, assert */
 
-module.exports = {
+describe('route.build()', function() {
+    var Route = Router.Route;
 
-    'route.build() with /opa' : function(done) {
+    it('route.build() with /opa', function(done) {
         var route = Route('/opa');
 
         assert.strictEqual(route.build(), '/opa');
@@ -18,9 +18,9 @@ module.exports = {
             '/opa?foo1=bar1&foo1=bar2&foo2=bar3');
 
         done();
-    },
+    });
 
-    'route.build() with /opa/<param>' : function(done) {
+    it('route.build() with /opa/<param>', function(done) {
         var route = Route('/opa/<param>');
 
         assert.strictEqual(route.build(), '/opa/');
@@ -34,9 +34,9 @@ module.exports = {
             '/opa/bar?foo1=bar1&foo1=bar2&foo2=bar3');
 
         done();
-    },
+    });
 
-    'route.build() with /opa/<param' : function(done) {
+    it('route.build() with /opa/<param', function(done) {
         var route = Route('/opa/<param');
 
         assert.strictEqual(route.build(), '/opa/<param');
@@ -45,9 +45,9 @@ module.exports = {
             '/opa/<param?param=bar&foo1=bar1&foo1=bar2&foo2=bar3');
 
         done();
-    },
+    });
 
-    'route.build() with /opa/<param> and defaults' : function(done) {
+    it('route.build() with /opa/<param> and defaults', function(done) {
         var route = Route({
                 pattern : '/opa/<param>',
                 defaults : {
@@ -61,9 +61,9 @@ module.exports = {
             '/opa/bar?foo1=bar1&foo1=bar2&foo2=bar3');
 
         done();
-    },
+    });
 
-    'route.build() with /opa(/opapa/<param>)' : function(done) {
+    it('route.build() with /opa(/opapa/<param>)', function(done) {
         var route = Route('/opa(/opapa/<param>)');
 
         assert.strictEqual(route.build(), '/opa');
@@ -72,9 +72,9 @@ module.exports = {
             '/opa/opapa/bar?foo1=bar1&foo1=bar2&foo2=bar3');
 
         done();
-    },
+    });
 
-    'route.build() with /opa(/opapa/<param>) and defaults' : function(done) {
+    it('route.build() with /opa(/opapa/<param>) and defaults', function(done) {
         var route = Route({
                 pattern : '/opa(/opapa/<param>)',
                 defaults : {
@@ -88,9 +88,9 @@ module.exports = {
             '/opa/opapa/bar?foo1=bar1&foo1=bar2&foo2=bar3');
 
         done();
-    },
+    });
 
-    'route.build() with /opa(/opapa/<param1>)(/<param2>)' : function(done) {
+    it('route.build() with /opa(/opapa/<param1>)(/<param2>)', function(done) {
         var route = Route('/opa(/opapa/<param1>)(/<param2>)');
 
         assert.strictEqual(route.build(), '/opa');
@@ -101,9 +101,9 @@ module.exports = {
             '/opa/opapa/bar?foo1=bar1&foo1=bar2&foo2=bar3');
 
         done();
-    },
+    });
 
-    'route.build() with /opa(/opapa/<param1>)(/<param2>) and defaults' : function(done) {
+    it('route.build() with /opa(/opapa/<param1>)(/<param2>) and defaults', function(done) {
         var route = Route({
             pattern : '/opa(/opapa/<param1>)(/<param2>)',
             defaults : {
@@ -120,9 +120,9 @@ module.exports = {
             '/opa/opapa/bar?foo1=bar1&foo1=bar2&foo2=bar3');
 
         done();
-    },
+    });
 
-    'Unsupported characters in params name' : function(done) {
+    it('Unsupported characters in params name', function(done) {
         [ '+', '.', ',', ' ' ].forEach(function(character) {
             var paramName = 'param' + character,
                 pattern = '/opa<' + paramName + '>',
@@ -135,9 +135,9 @@ module.exports = {
         });
 
         done();
-    },
+    });
 
-    'You musn\'t start params name with digit' : function(done) {
+    it('You musn\'t start params name with digit', function(done) {
         [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ].forEach(function(character) {
             var paramName = character + 'param',
                 pattern = '/opa<' + paramName + '>',
@@ -150,6 +150,6 @@ module.exports = {
         });
 
         done();
-    }
+    });
 
-};
+});

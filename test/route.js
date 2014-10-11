@@ -1,31 +1,31 @@
-var Route = require('./lib/router').Route,
-    assert = require('chai').assert;
+/* global describe, it, Router, assert */
 
-module.exports = {
+describe('Route', function() {
+    var Route = Router.Route;
 
-    '`Route` must be function' : function(done) {
+    it('`Route` must be function', function(done) {
         assert.ok(typeof Route === 'function');
 
         done();
-    },
+    });
 
-    '`Route` must be constructor' : function(done) {
+    it('`Route` must be constructor', function(done) {
         var route = new Route({ pattern : '/opa' });
 
         assert.ok(route instanceof Route);
 
         done();
-    },
+    });
 
-    '`Route` can be called without "new"' : function(done) {
+    it('`Route` can be called without "new"', function(done) {
         var route = Route({ pattern : '/opa' });
 
         assert.ok(route instanceof Route);
 
         done();
-    },
+    });
 
-    '`options` is mandatory' : function(done) {
+    it('`options` is mandatory', function(done) {
         try {
             Route();
 
@@ -35,9 +35,9 @@ module.exports = {
         }
 
         done();
-    },
+    });
 
-    '`options.pattern` property is mandatory' : function(done) {
+    it('`options.pattern` property is mandatory', function(done) {
         try {
             Route({ name : 'opa' });
 
@@ -47,9 +47,9 @@ module.exports = {
         }
 
         done();
-    },
+    });
 
-    '`options` can be string' : function(done) {
+    it('`options` can be string', function(done) {
         try {
             Route('/opa');
 
@@ -59,6 +59,6 @@ module.exports = {
         }
 
         done();
-    }
+    });
 
-};
+});

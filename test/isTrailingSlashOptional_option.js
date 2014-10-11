@@ -1,9 +1,9 @@
-var Route = require('./lib/router').Route,
-    assert = require('chai').assert;
+/* global describe, it, Router, assert */
 
-module.exports = {
+describe('isTrailingSlashOptional option', function() {
+    var Route = Router.Route;
 
-    'isTrailingSlashOptional is true by default => trailing slash is not necessary' : function(done) {
+    it('isTrailingSlashOptional is true by default => trailing slash is not necessary', function(done) {
         var route1 = Route('/opa'),
             route2 = Route('/opa/<param>'),
             route3 = Route('/opa(/<param>)'),
@@ -43,9 +43,9 @@ module.exports = {
         assert.deepEqual(route5.match('/opa/'), null);
 
         done();
-    },
+    });
 
-    'isTrailingSlashOptional === false' : function(done) {
+    it('isTrailingSlashOptional === false', function(done) {
         var route1 = Route({ pattern : '/opa', isTrailingSlashOptional : false }),
             route2 = Route({ pattern : '/opa/<param>', isTrailingSlashOptional : false }),
             route3 = Route({ pattern : '/opa/<param>(/)', isTrailingSlashOptional : false });
@@ -60,6 +60,6 @@ module.exports = {
         assert.deepEqual(route3.match('/opa/value/'), { param : 'value' });
 
         done();
-    }
+    });
 
-};
+});

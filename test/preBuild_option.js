@@ -1,9 +1,9 @@
-var Route = require('./lib/router').Route,
-    assert = require('chai').assert;
+/* global describe, it, Router, assert */
 
-module.exports = {
+describe('preBuild option', function() {
+    var Route = Router.Route;
 
-    'preBuild must be a function' : function(done) {
+    it('preBuild must be a function', function(done) {
         var route = Route({
             pattern : '/opa/<param>',
             preBuild : true
@@ -12,9 +12,9 @@ module.exports = {
         assert.deepEqual(route.build({ param : 'value' }), '/opa/value');
 
         done();
-    },
+    });
 
-    '/opa/<param> with preBuild function' : function(done) {
+    it('/opa/<param> with preBuild function', function(done) {
         var route = Route({
             pattern : '/opa/<param>',
             preBuild : function(params) {
@@ -37,6 +37,6 @@ module.exports = {
         assert.deepEqual(route.build({ param : 'value', foo : 'bar1' }), '/opa/value?foo=bar');
 
         done();
-    }
+    });
 
-};
+});

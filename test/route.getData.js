@@ -1,14 +1,14 @@
-var Route = require('./lib/router').Route,
-    assert = require('chai').assert;
+/* global describe, it, Router, assert */
 
-module.exports = {
+describe('route.getData()', function() {
+    var Route = Router.Route;
 
-    'route.getData() must return right data' : function(done) {
+    it('route.getData() must return right data', function(done) {
         assert.deepEqual(Route('/opa').getData(), {});
         assert.deepEqual(Route({ pattern : '/opa' }).getData(), {});
         assert.deepEqual(Route({ pattern : '/opa', data : { foo : 'bar' } }).getData(), { foo : 'bar' });
 
         done();
-    }
+    });
 
-};
+});

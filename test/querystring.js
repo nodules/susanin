@@ -1,10 +1,10 @@
-var qs = require('../lib/querystring'),
-    assert = require('chai').assert,
-    undef;
+/* global describe, it, assert, querystring */
 
-module.exports = {
+describe('querystring module', function() {
+    var qs = querystring,
+        undef;
 
-    'route.parse()' : function(done) {
+    it('route.parse()', function(done) {
         assert.deepEqual(qs.parse(), {});
         assert.deepEqual(qs.parse(null), {});
         assert.deepEqual(qs.parse(undef), {});
@@ -27,9 +27,9 @@ module.exports = {
         assert.deepEqual(qs.parse('bla=foo&bla1=foo1'), { bla : 'foo', bla1 : 'foo1' });
 
         done();
-    },
+    });
 
-    'route.stringify()' : function(done) {
+    it('route.stringify()', function(done) {
         assert.strictEqual(qs.stringify(), '');
         assert.strictEqual(qs.stringify(null), '');
         assert.strictEqual(qs.stringify(undef), '');
@@ -51,6 +51,6 @@ module.exports = {
         assert.strictEqual(qs.stringify([ 1, 2, 3 ]), '0=1&1=2&2=3');
 
         done();
-    }
+    });
 
-};
+});

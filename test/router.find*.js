@@ -1,9 +1,8 @@
-var Router = require('./lib/router'),
-    assert = require('chai').assert;
+/* global describe, it, before, Router, assert */
 
-module.exports = {
+describe('router.find*', function() {
 
-    setUp : function(done) {
+    before(function(done) {
         var router = this.router = Router();
 
         router
@@ -35,9 +34,9 @@ module.exports = {
         });
 
         done();
-    },
+    });
 
-    '`findFirst` method' : function(done) {
+    it('`findFirst` method', function(done) {
         var finded = this.router.findFirst('/first');
 
         assert.strictEqual(finded[0], this.router.getRouteByName('first'));
@@ -46,9 +45,9 @@ module.exports = {
         assert.strictEqual(this.router.findFirst('/f'), null);
 
         done();
-    },
+    });
 
-    '`find` method' : function(done) {
+    it('`find` method', function(done) {
         var finded = this.router.find('/first');
 
         assert.strictEqual(finded.length, 3);
@@ -62,6 +61,6 @@ module.exports = {
         assert.deepEqual(this.router.find('/f'), []);
 
         done();
-    }
+    });
 
-};
+});

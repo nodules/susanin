@@ -8,32 +8,42 @@ ISTANBUL := $(BIN_DIR)istanbul
 BORSCHIK := $(BIN_DIR)borschik
 MOCHA := $(BIN_DIR)mocha
 _MOCHA := $(BIN_DIR)_mocha
+KARMA := $(PRJ_DIR)node_modules/karma/bin/karma
 
-DIRS_FOR_LINT := $(PRJ_DIR)lib $(PRJ_DIR)test
+FILES_FOR_LINT := $(PRJ_DIR)lib $(PRJ_DIR)test/*.js $(PRJ_DIR)karma.conf.js
 
-all: build test
+all: build test hook
 
 .PHONY: test
-test: jshint jscs unittests
+test: codestyle unittests
+
+.PHONY: codestyle
+codestyle: jscs jshint
 
 .PHONY: unittests
-unittests: $(MOCHA) build
-	$(MOCHA) -u exports -R spec $(PRJ_DIR)test
-	ROUTER=dist $(MOCHA) -u exports -R spec $(PRJ_DIR)test
+unittests: nodejsunittests browsersunittests
+
+.PHONY: unittests_in_nodejs
+nodejsunittests: $(MOCHA)
+	$(MOCHA) -u bdd -R spec -r chai $(PRJ_DIR)test/lib/nodejs.js $(PRJ_DIR)test/*.js
+
+.PHONY: unittests_in_browsers
+browsersunittests: $(KARMA) build
+	PHANTOMJS_BIN=/usr/bin/phantomjs $(KARMA) start $(PRJ_DIR)karma.conf.js --single-run
 
 .PHONY: jshint
 jshint: $(JSHINT)
-	$(JSHINT) $(DIRS_FOR_LINT)
+	$(JSHINT) $(FILES_FOR_LINT)
 
 .PHONY: jscs
 jscs: $(JSCS)
-	$(JSCS) $(DIRS_FOR_LINT)
+	$(JSCS) $(FILES_FOR_LINT)
 
 .PHONY: coverage
 coverage: $(ISTANBUL) $(_MOCHA)
 	$(ISTANBUL) cover $(_MOCHA) -- -u exports $(PRJ_DIR)test
 
-$(JSHINT) $(MOCHA) $(_MOCHA) $(ISTANBUL) $(JSCS) $(BORSCHIK):
+$(JSHINT) $(MOCHA) $(_MOCHA) $(ISTANBUL) $(JSCS) $(BORSCHIK) $(KARMA):
 	npm install
 
 .PHONY: hook

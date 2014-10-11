@@ -21,7 +21,12 @@
         "istanbul" : "0.1.x",
         "mocha" : "1.11.x",
         "chai" : "1.7.x",
-        "borschik" : "0.3.x"
+        "borschik" : "0.3.x",
+        "karma" : "~0.12.24",
+        "karma-chrome-launcher" : "~0.1.5",
+        "karma-firefox-launcher" : "~0.1.3",
+        "karma-phantomjs-launcher" : "~0.1.4",
+        "karma-mocha" : "~0.1.9"
     },
     "optionalDependencies" : {},
     "main" : "lib/router.js",

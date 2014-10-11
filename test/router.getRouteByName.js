@@ -1,9 +1,8 @@
-var Router = require('./lib/router'),
-    assert = require('chai').assert;
+/* global describe, it, Router, assert */
 
-module.exports = {
+describe('router.getRouteByName()', function() {
 
-    '`getRouteByName` must return right instance of `Route`' : function(done) {
+    it('`getRouteByName` must return right instance of `Route`', function(done) {
         var router = Router(),
             routeFoo = router.addRoute({ pattern : '/foo', data : { name : 'foo' } }),
             routeBar = router.addRoute({ pattern : '/bar', data : { name : 'bar' } });
@@ -13,6 +12,6 @@ module.exports = {
         assert.strictEqual(router.getRouteByName('opa'), null);
 
         done();
-    }
+    });
 
-};
+});

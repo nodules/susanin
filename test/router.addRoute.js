@@ -1,19 +1,18 @@
-var Router = require('./lib/router'),
-    Route = Router.Route,
-    assert = require('chai').assert;
+/* global describe, it, Router, assert */
 
-module.exports = {
+describe('route.match()', function() {
+    var Route = Router.Route;
 
-    'Instance of `Router` must have function `addRoute`' : function(done) {
+    it('Instance of `Router` must have function `addRoute`', function(done) {
         assert.ok(typeof Router().addRoute === 'function');
 
         done();
-    },
+    });
 
-    '`addRoute` must return instance of Route' : function(done) {
+    it('`addRoute` must return instance of Route', function(done) {
         assert.ok(Router().addRoute({ name : 'first', pattern : '/opa' }) instanceof Route);
 
         done();
-    }
+    });
 
-};
+});

@@ -1,18 +1,18 @@
-var Route = require('./lib/router').Route,
-    assert = require('chai').assert;
+/* global describe, it, Router, assert */
 
-module.exports = {
+describe('route.match()', function() {
+    var Route = Router.Route;
 
-    'route.match(undefined)' : function(done) {
+    it('route.match(undefined)', function(done) {
         var route = Route('/opa'),
             undef;
 
         assert.deepEqual(route.match(undef), null);
 
         done();
-    },
+    });
 
-    'route.match() with /opa' : function(done) {
+    it('route.match() with /opa', function(done) {
         var route = Route('/opa');
 
         assert.deepEqual(route.match('/opapa'), null);
@@ -24,9 +24,9 @@ module.exports = {
         assert.deepEqual(route.match('/opa?foo=bar1&foo=bar2'), { foo : [ 'bar1', 'bar2' ] });
 
         done();
-    },
+    });
 
-    'route.match() with /opa with defaults' : function(done) {
+    it('route.match() with /opa with defaults', function(done) {
         var route = Route({
             pattern : '/opa',
             defaults : {
@@ -40,9 +40,9 @@ module.exports = {
             { param : 'value', foo1 : [ 'bar1', 'bar2' ], foo2 : '', '' : 'bar3' });
 
         done();
-    },
+    });
 
-    'route.match() with /opa/<param>' : function(done) {
+    it('route.match() with /opa/<param>', function(done) {
         var route = Route({
             pattern : '/opa/<param>'
         });
@@ -55,9 +55,9 @@ module.exports = {
             { param : 'value', foo1 : [ 'bar1', 'bar2' ], foo2 : '', '' : 'bar3' });
 
         done();
-    },
+    });
 
-    'route.match() with /opa/<param> and defaults' : function(done) {
+    it('route.match() with /opa/<param> and defaults', function(done) {
         var route = Route({
             pattern : '/opa/<param>',
             defaults : {
@@ -74,9 +74,9 @@ module.exports = {
             { param : 'value', param2 : 'value2', foo1 : [ 'bar1', 'bar2' ], foo2 : '', '' : 'bar3' });
 
         done();
-    },
+    });
 
-    'route.match() with /opa/<param> and conditions like array' : function(done) {
+    it('route.match() with /opa/<param> and conditions like array', function(done) {
         var route = Route({
             pattern : '/opa/<param>',
             conditions : {
@@ -93,9 +93,9 @@ module.exports = {
             { param : 'value1', foo1 : [ 'bar1', 'bar2' ], foo2 : '', '' : 'bar3' });
 
         done();
-    },
+    });
 
-    'route.match() with /opa/<param> and conditions like RegExp' : function(done) {
+    it('route.match() with /opa/<param> and conditions like RegExp', function(done) {
         var route = Route({
             pattern : '/opa/<param>',
             conditions : {
@@ -114,9 +114,9 @@ module.exports = {
             { param : 'value1', foo1 : [ 'bar1', 'bar2' ], foo2 : '', '' : 'bar3' });
 
         done();
-    },
+    });
 
-    'route.match() with /opa(/opapa/<param>)' : function(done) {
+    it('route.match() with /opa(/opapa/<param>)', function(done) {
         var route = Route({
             pattern : '/opa(/opapa/<param>)'
         });
@@ -131,9 +131,9 @@ module.exports = {
             { foo1 : [ 'bar1', 'bar2' ], foo2 : '', '' : 'bar3' });
 
         done();
-    },
+    });
 
-    'route.match() with /opa(/opapa/<param>) and defaults' : function(done) {
+    it('route.match() with /opa(/opapa/<param>) and defaults', function(done) {
         var route = Route({
             pattern : '/opa(/opapa/<param>)',
             defaults : {
@@ -151,9 +151,9 @@ module.exports = {
             { param : 'value2', foo1 : [ 'bar1', 'bar2' ], foo2 : '', '' : 'bar3' });
 
         done();
-    },
+    });
 
-    'route.match() with /opa(/opapa/<param>), conditions and defaults' : function(done) {
+    it('route.match() with /opa(/opapa/<param>), conditions and defaults', function(done) {
         var route = Route({
             pattern : '/opa(/opapa/<param>)',
             conditions : {
@@ -177,9 +177,9 @@ module.exports = {
             { param : 'value2', foo1 : [ 'bar1', 'bar2' ], foo2 : '', '' : 'bar3' });
 
         done();
-    },
+    });
 
-    'route.match() with /opa/<param1>(/opapa/<param2>(/<param3>))(/)' : function(done) {
+    it('route.match() with /opa/<param1>(/opapa/<param2>(/<param3>))(/)', function(done) {
         var route = Route({
             pattern : '/opa/<param1>(/opapa/<param2>(/<param3>))(/)',
             conditions : {
@@ -212,6 +212,6 @@ module.exports = {
             { param : 'value', param1 : 'value2', foo1 : [ 'bar1', 'bar2' ], foo2 : '', '' : 'bar3' });
 
         done();
-    }
+    });
 
-};
+});
