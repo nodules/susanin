@@ -29,7 +29,7 @@ nodejsunittests: $(MOCHA)
 
 .PHONY: unittests_in_browsers
 browsersunittests: $(KARMA) build
-	PHANTOMJS_BIN=/usr/bin/phantomjs $(KARMA) start $(PRJ_DIR)karma.conf.js --single-run
+	$(KARMA) start $(PRJ_DIR)karma.conf.js --single-run
 
 .PHONY: jshint
 jshint: $(JSHINT)
