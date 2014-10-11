@@ -161,7 +161,7 @@ var GROUP_OPENED_CHAR = '(';
 var GROUP_CLOSED_CHAR = ')';
 
 var PARAM_NAME_REGEXP_SOURCE = '[a-zA-Z_][\\w\\-]*';
-var PARAM_VALUE_REGEXP_SOURCE = '[\\w\\-]+';
+var PARAM_VALUE_REGEXP_SOURCE = '[\\w\\-\\.~]+';
 
 var PARSE_PARAMS_REGEXP =
     new RegExp(
@@ -495,12 +495,6 @@ Route.prototype.match = function(matchObject) {
                 }
             }
 
-            for (key in defaults) {
-                if (has(defaults, key) && ! has(ret, key)) {
-                    ret[key] = defaults[key];
-                }
-            }
-
             queryParams = querystring.parse(ret[QUERY_STRING_PARAM_NAME]);
             for (key in queryParams) {
                 if (has(queryParams, key) && ! has(ret, key)) {
@@ -508,6 +502,12 @@ Route.prototype.match = function(matchObject) {
                 }
             }
             delete ret[QUERY_STRING_PARAM_NAME];
+
+            for (key in defaults) {
+                if (has(defaults, key) && ! has(ret, key)) {
+                    ret[key] = defaults[key];
+                }
+            }
         }
     } else {
         ret = {};
@@ -695,5 +695,31 @@ module.exports = Router;
         })[key]();
     }
 
-    global.Susanin = require('./router');
+    var Router = require('./router'),
+        defineAsGlobal = true;
+
+    // CommonJS
+    if (global.module && typeof module.exports === 'object') {
+        module.exports = Router;
+        defineAsGlobal = false;
+    }
+
+    // YModules support
+    if (global.modules && modules.define && modules.require) {
+        modules.define('susanin', function(provide) {
+            provide(Router);
+        });
+        defineAsGlobal = false;
+    }
+
+    // AMD support
+    if (typeof global.define === 'function' && define.amd) {
+        define(function() {
+            return Router;
+        });
+        defineAsGlobal = false;
+    }
+
+    defineAsGlobal && (global.Susanin = Router);
+
 })(this);

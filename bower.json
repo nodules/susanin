@@ -1,13 +1,13 @@
 {
     "name" : "susanin",
-    "main" : "./lib/susanin.js",
-    "version" : "0.1.9",
+    "main" : "./dist/susanin.js",
+    "version" : "1.0.0",
     "ignore" : [
         "**/.*",
         "Makefile",
-        "package.json",
-        "bower.json",
+        "*.json",
         "test",
+        "lib",
         "pre-commit",
         "README.md"
     ]

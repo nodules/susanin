@@ -3,7 +3,7 @@
 describe('route.build()', function() {
     var Route = Router.Route;
 
-    it('route.build() with /opa', function(done) {
+    it('/opa', function(done) {
         var route = Route('/opa');
 
         assert.strictEqual(route.build(), '/opa');
@@ -20,7 +20,7 @@ describe('route.build()', function() {
         done();
     });
 
-    it('route.build() with /opa/<param>', function(done) {
+    it('/opa/<param>', function(done) {
         var route = Route('/opa/<param>');
 
         assert.strictEqual(route.build(), '/opa/');
@@ -36,7 +36,7 @@ describe('route.build()', function() {
         done();
     });
 
-    it('route.build() with /opa/<param', function(done) {
+    it('/opa/<param', function(done) {
         var route = Route('/opa/<param');
 
         assert.strictEqual(route.build(), '/opa/<param');
@@ -47,7 +47,7 @@ describe('route.build()', function() {
         done();
     });
 
-    it('route.build() with /opa/<param> and defaults', function(done) {
+    it('/opa/<param> and defaults', function(done) {
         var route = Route({
                 pattern : '/opa/<param>',
                 defaults : {
@@ -63,7 +63,7 @@ describe('route.build()', function() {
         done();
     });
 
-    it('route.build() with /opa(/opapa/<param>)', function(done) {
+    it('/opa(/opapa/<param>)', function(done) {
         var route = Route('/opa(/opapa/<param>)');
 
         assert.strictEqual(route.build(), '/opa');
@@ -74,7 +74,7 @@ describe('route.build()', function() {
         done();
     });
 
-    it('route.build() with /opa(/opapa/<param>) and defaults', function(done) {
+    it('/opa(/opapa/<param>) and defaults', function(done) {
         var route = Route({
                 pattern : '/opa(/opapa/<param>)',
                 defaults : {
@@ -90,7 +90,7 @@ describe('route.build()', function() {
         done();
     });
 
-    it('route.build() with /opa(/opapa/<param1>)(/<param2>)', function(done) {
+    it('/opa(/opapa/<param1>)(/<param2>)', function(done) {
         var route = Route('/opa(/opapa/<param1>)(/<param2>)');
 
         assert.strictEqual(route.build(), '/opa');
@@ -103,7 +103,7 @@ describe('route.build()', function() {
         done();
     });
 
-    it('route.build() with /opa(/opapa/<param1>)(/<param2>) and defaults', function(done) {
+    it('/opa(/opapa/<param1>)(/<param2>) and defaults', function(done) {
         var route = Route({
             pattern : '/opa(/opapa/<param1>)(/<param2>)',
             defaults : {

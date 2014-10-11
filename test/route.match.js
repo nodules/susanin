@@ -12,7 +12,7 @@ describe('route.match()', function() {
         done();
     });
 
-    it('route.match() with /opa', function(done) {
+    it('/opa', function(done) {
         var route = Route('/opa');
 
         assert.deepEqual(route.match('/opapa'), null);
@@ -26,7 +26,7 @@ describe('route.match()', function() {
         done();
     });
 
-    it('route.match() with /opa with defaults', function(done) {
+    it('/opa with defaults', function(done) {
         var route = Route({
             pattern : '/opa',
             defaults : {
@@ -42,7 +42,7 @@ describe('route.match()', function() {
         done();
     });
 
-    it('route.match() with /opa/<param>', function(done) {
+    it('/opa/<param>', function(done) {
         var route = Route({
             pattern : '/opa/<param>'
         });
@@ -57,7 +57,7 @@ describe('route.match()', function() {
         done();
     });
 
-    it('route.match() with /opa/<param> and defaults', function(done) {
+    it('/opa/<param> and defaults', function(done) {
         var route = Route({
             pattern : '/opa/<param>',
             defaults : {
@@ -76,7 +76,7 @@ describe('route.match()', function() {
         done();
     });
 
-    it('route.match() with /opa/<param> and conditions like array', function(done) {
+    it('/opa/<param> and conditions like array', function(done) {
         var route = Route({
             pattern : '/opa/<param>',
             conditions : {
@@ -95,7 +95,7 @@ describe('route.match()', function() {
         done();
     });
 
-    it('route.match() with /opa/<param> and conditions like RegExp', function(done) {
+    it('/opa/<param> and conditions like RegExp', function(done) {
         var route = Route({
             pattern : '/opa/<param>',
             conditions : {
@@ -116,7 +116,7 @@ describe('route.match()', function() {
         done();
     });
 
-    it('route.match() with /opa(/opapa/<param>)', function(done) {
+    it('/opa(/opapa/<param>)', function(done) {
         var route = Route({
             pattern : '/opa(/opapa/<param>)'
         });
@@ -133,7 +133,7 @@ describe('route.match()', function() {
         done();
     });
 
-    it('route.match() with /opa(/opapa/<param>) and defaults', function(done) {
+    it('/opa(/opapa/<param>) and defaults', function(done) {
         var route = Route({
             pattern : '/opa(/opapa/<param>)',
             defaults : {
@@ -153,7 +153,7 @@ describe('route.match()', function() {
         done();
     });
 
-    it('route.match() with /opa(/opapa/<param>), conditions and defaults', function(done) {
+    it('/opa(/opapa/<param>), conditions and defaults', function(done) {
         var route = Route({
             pattern : '/opa(/opapa/<param>)',
             conditions : {
@@ -172,14 +172,14 @@ describe('route.match()', function() {
         assert.deepEqual(route.match('/opa/opapa/value'), null);
         assert.deepEqual(route.match('/opa/opapa/valuea'), null);
         assert.deepEqual(route.match('/opa?param=value3&foo1=bar1&foo1=bar2&foo2=&=bar3'),
-            { param : 'value1', foo1 : [ 'bar1', 'bar2' ], foo2 : '', '' : 'bar3' });
+            { param : 'value3', foo1 : [ 'bar1', 'bar2' ], foo2 : '', '' : 'bar3' });
         assert.deepEqual(route.match('/opa/opapa/value2?param=value3&foo1=bar1&foo1=bar2&foo2=&=bar3'),
             { param : 'value2', foo1 : [ 'bar1', 'bar2' ], foo2 : '', '' : 'bar3' });
 
         done();
     });
 
-    it('route.match() with /opa/<param1>(/opapa/<param2>(/<param3>))(/)', function(done) {
+    it('/opa/<param1>(/opapa/<param2>(/<param3>))(/)', function(done) {
         var route = Route({
             pattern : '/opa/<param1>(/opapa/<param2>(/<param3>))(/)',
             conditions : {
@@ -209,7 +209,7 @@ describe('route.match()', function() {
         assert.deepEqual(route.match('/opa/value2/opapa/value5/Value/'),
             { param : 'value', param1 : 'value2', param2 : 'value5', param3 : 'Value' });
         assert.deepEqual(route.match('/opa/value2?param=value3&foo1=bar1&foo1=bar2&foo2=&=bar3'),
-            { param : 'value', param1 : 'value2', foo1 : [ 'bar1', 'bar2' ], foo2 : '', '' : 'bar3' });
+            { param : 'value3', param1 : 'value2', foo1 : [ 'bar1', 'bar2' ], foo2 : '', '' : 'bar3' });
 
         done();
     });
