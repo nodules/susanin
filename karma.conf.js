@@ -15,7 +15,7 @@ module.exports = function(config) {
         files : [
             'dist/susanin.min.js',
             'node_modules/chai/chai.js',
-            'test/lib/browser.js',
+            'test/browser/*.js',
             'lib/querystring.js',
             'test/*.js'
         ],

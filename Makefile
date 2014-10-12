@@ -25,7 +25,7 @@ unittests: nodejsunittests browsersunittests
 
 .PHONY: unittests_in_nodejs
 nodejsunittests: $(MOCHA)
-	$(MOCHA) -u bdd -R spec -r chai $(PRJ_DIR)test/lib/nodejs.js $(PRJ_DIR)test/*.js
+	$(MOCHA) -u bdd -R spec -r chai $(PRJ_DIR)test/nodejs $(PRJ_DIR)test
 
 .PHONY: unittests_in_browsers
 browsersunittests: $(KARMA) build
@@ -41,7 +41,7 @@ jscs: $(JSCS)
 
 .PHONY: coverage
 coverage: $(ISTANBUL) $(_MOCHA)
-	$(ISTANBUL) cover $(_MOCHA) -- -u exports $(PRJ_DIR)test
+	$(ISTANBUL) cover $(_MOCHA) -- -u bdd $(PRJ_DIR)test/nodejs $(PRJ_DIR)test
 
 $(JSHINT) $(MOCHA) $(_MOCHA) $(ISTANBUL) $(JSCS) $(BORSCHIK) $(KARMA):
 	npm install

@@ -41,7 +41,7 @@ describe('router.find*', function() {
 
         assert.strictEqual(finded[0], this.router.getRouteByName('first'));
         assert.deepEqual(finded[1], {});
-        assert.strictEqual(this.router.findFirst({ path : '/first', method : 'post' })[0], this.router.getRouteByName('third'));
+        assert.strictEqual(this.router.findFirst('/first', { method : 'post' })[0], this.router.getRouteByName('third'));
         assert.strictEqual(this.router.findFirst('/f'), null);
 
         done();
@@ -57,7 +57,7 @@ describe('router.find*', function() {
         assert.deepEqual(finded[0][1], {});
         assert.deepEqual(finded[1][1], {});
         assert.deepEqual(finded[2][1], {});
-        assert.strictEqual(this.router.find({ path : '/first', method : 'post' })[0][0], this.router.getRouteByName('third'));
+        assert.strictEqual(this.router.find('/first', { method : 'post' })[0][0], this.router.getRouteByName('third'));
         assert.deepEqual(this.router.find('/f'), []);
 
         done();

@@ -133,6 +133,23 @@ describe('route.match()', function() {
         done();
     });
 
+    it('/opa)(/opapa/<param>)', function(done) {
+        var route = Route({
+            pattern : '/opa)(/opapa/<param>)'
+        });
+
+        assert.deepEqual(route.match('/opa'), null);
+        assert.deepEqual(route.match('/opa)/'), {});
+        assert.deepEqual(route.match('/opa)'), {});
+        assert.deepEqual(route.match('/opa)/value'), null);
+        assert.deepEqual(route.match('/opa)/opapa/'), null);
+        assert.deepEqual(route.match('/opa)/opapa/value'), { param : 'value' });
+        assert.deepEqual(route.match('/opa)?foo1=bar1&foo1=bar2&foo2=&=bar3'),
+            { foo1 : [ 'bar1', 'bar2' ], foo2 : '', '' : 'bar3' });
+
+        done();
+    });
+
     it('/opa(/opapa/<param>) and defaults', function(done) {
         var route = Route({
             pattern : '/opa(/opapa/<param>)',

@@ -30,6 +30,11 @@ describe('querystring module', function() {
     });
 
     it('route.stringify()', function(done) {
+        function Params() {
+            this.bla  = 'foo';
+        }
+        Params.prototype = { bla1 : 'foo1' };
+
         assert.strictEqual(qs.stringify(), '');
         assert.strictEqual(qs.stringify(null), '');
         assert.strictEqual(qs.stringify(undef), '');
@@ -48,6 +53,7 @@ describe('querystring module', function() {
         assert.strictEqual(qs.stringify({ bla : [ 'foo1', 'foo2' ] }), 'bla=foo1&bla=foo2');
         assert.strictEqual(qs.stringify({ bla : 'foo', bla1 : 'foo1' }), 'bla=foo&bla1=foo1');
         assert.strictEqual(qs.stringify({ bla : 'foo', bla1 : 'foo1' }), 'bla=foo&bla1=foo1');
+        assert.strictEqual(qs.stringify(new Params()), 'bla=foo');
         assert.strictEqual(qs.stringify([ 1, 2, 3 ]), '0=1&1=2&2=3');
 
         done();

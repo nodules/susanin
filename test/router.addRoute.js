@@ -1,6 +1,6 @@
 /* global describe, it, Router, assert */
 
-describe('route.match()', function() {
+describe('route.addRoute()', function() {
     var Route = Router.Route;
 
     it('Instance of `Router` must have function `addRoute`', function(done) {
