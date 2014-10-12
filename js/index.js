@@ -88,8 +88,8 @@
 
             return Susanin;
         })(),
-        '1.0.0-alpha' : (function() {
-            /* borschik:include:../libs/susanin_1.0.0-alpha/dist/susanin.js */
+        '1.0.0' : (function() {
+            /* borschik:include:../libs/susanin_1.0.0/dist/susanin.js */
 
             return Susanin;
         })()
