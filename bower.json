@@ -5,7 +5,9 @@
     "ignore" : [
         "**/.*",
         "Makefile",
+	"dist/susanin.tmp.js",
         "*.json",
+	"*.conf.js",
         "test",
         "lib",
         "pre-commit",
