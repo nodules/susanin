@@ -231,4 +231,17 @@ describe('route.match()', function() {
         done();
     });
 
+    it('/opa/<query_string>', function(done) {
+        var route = Route({
+            pattern : '/opa/<query_string>'
+        });
+
+        assert.deepEqual(route.match('/opapa'), null);
+        assert.deepEqual(route.match('/opa'), null);
+        assert.deepEqual(route.match('/opa/value'), { query_string : 'value' });
+        assert.deepEqual(route.match('/opa/value?foo=bar'), { query_string : 'value', foo : 'bar' });
+
+        done();
+    });
+
 });
