@@ -62,7 +62,7 @@
     //"maxparams" : 5,
 
     // This option lets you control how nested do you want your blocks tobe.
-    "maxdepth" : 5,
+    "maxdepth" : 7,
 
     // This option lets you set the max number of statements allowed per function.
     "maxstatements" : false,
