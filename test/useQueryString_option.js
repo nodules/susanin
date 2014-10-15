@@ -59,15 +59,15 @@ describe('useQueryString option', function() {
 
         it('match()', function(done) {
             assert.deepEqual(route1.match('/opa'), {});
-            assert.deepEqual(route1.match('/opa?foo=bar'), null);
+            assert.deepEqual(route1.match('/opa?foo=bar'), {});
 
             assert.deepEqual(route2.match('/opa/value'), { param : 'value' });
-            assert.deepEqual(route2.match('/opa/value?param=bar'), null);
+            assert.deepEqual(route2.match('/opa/value?param=bar'), { param : 'value' });
 
             assert.deepEqual(route3.match('/opa'), {});
-            assert.deepEqual(route3.match('/opa?param=value'), null);
+            assert.deepEqual(route3.match('/opa?param=value'), {});
             assert.deepEqual(route3.match('/opa/value'), { param : 'value' });
-            assert.deepEqual(route3.match('/opa/value?param=value1'), null);
+            assert.deepEqual(route3.match('/opa/value?param=value1'), { param : 'value' });
 
             done();
         });
