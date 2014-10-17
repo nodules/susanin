@@ -40,8 +40,10 @@
                         Define <a target="_blank" href="https://github.com/nodules/susanin#match">match object</a>.
                         It must be an object or a string
                     </p>
-                    <textarea id="match-options-textarea"></textarea>
-                    <div id="match-options-error" class="alert alert-danger"></div>
+                    <textarea id="match-path-textarea"></textarea>
+                    <div id="match-path-error" class="alert alert-danger"></div>
+                    <textarea id="match-data-textarea"></textarea>
+                    <div id="match-data-error" class="alert alert-danger"></div>
                 </div>
                 <div class="col-md-6">
                     <p class="lead">
@@ -53,6 +55,10 @@
             <div class="row">
                 <div class="col-md-6">
                     <p class="lead">
+                        <label class="pull-right" id="build-strict-checkbox-label">
+                            <input name="strict" type="checkbox" value="true" id="build-strict-checkbox">
+                            strict
+                        </label>
                         Define <a target="_blank" href="https://github.com/nodules/susanin#build">build params</a>.
                         It must be an object
                     </p>

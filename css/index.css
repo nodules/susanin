@@ -17,20 +17,10 @@
     overflow-x: auto;
 }
 
-#unit .CodeMirror-scroll
-{
-    height: 100px;
-}
-
-#route-options-error,
-#match-options-error,
-#build-params-error
-{
-    display: none;
-}
-
 .alert-danger
 {
+    display: none;
+
     border-top: 0;
     -webkit-border-top-left-radius: 0;
     -moz-border-top-left-radius: 0;
@@ -39,20 +29,9 @@
     -moz-border-top-right-radius: 4px;
     border-top-right-radius: 0;
     margin-top: -4px;
-    margin-bottom: -26px;
+    margin-bottom: -20px;
     padding: 3px 7px;
     height: 24px;
-}
-
-#unit
-{
-    margin-top: 20px;
-}
-
-textarea
-{
-    width: 100%;
-    min-height: 100px;
 }
 
 .row
@@ -60,8 +39,51 @@ textarea
     margin-top: 40px;
 }
 
+#unit
+{
+    margin-top: 20px;
+}
+
 #version
 {
     width: auto;
     margin-right: 10px;
+}
+
+#build-strict-checkbox-label
+{
+    font-weight: normal;
+}
+
+#match-data-textarea
+{
+    margin-top: 20px;
+}
+
+#unit .CodeMirror-scroll
+{
+    height: 100px;
+}
+
+#match-data-textarea + .CodeMirror
+{
+    margin-top: 25px;
+}
+
+[class*="version_0."] #build-strict-checkbox-label,
+[class*="version_0."] #match-data-textarea,
+[class*="version_0."] #match-data-textarea + .CodeMirror,
+[class*="version_0."] #match-data-error
+{
+    display: none;
+}
+
+[class*="version_1."] #match-path-textarea + .CodeMirror
+{
+    height: 30px;
+}
+
+[class*="version_1."] #match-result-textarea + .CodeMirror .CodeMirror-scroll
+{
+    height: 155px;
 }

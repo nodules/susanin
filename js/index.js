@@ -12,61 +12,93 @@
         /* jshint evil: true */
         var Susanin = susaninByVersion[currentVersion],
             route,
-            rawRouteOptions,
+            rawRouteOptions = routeOptionsEditor.getValue(),
             routeOptions,
-            rawMatchOptions,
-            matchOptions,
-            rawBuildParams,
-            buildParams;
+            rawMatchPath = matchPathEditor.getValue(),
+            matchPath,
+            rawMatchData = matchDataEditor.getValue(),
+            matchData,
+            matchResult,
+            rawBuildParams = buildParamsEditor.getValue(),
+            buildParams,
+            isBuildStrict = $buildStrictCheckbox.prop('checked');
 
-        try {
-            rawRouteOptions = routeOptionsEditor.getValue();
-            if (rawRouteOptions !== '') {
+        $permalink.attr(
+            'href',
+                '#' + encodeURIComponent([
+                rawRouteOptions,
+                rawMatchPath,
+                rawBuildParams,
+                currentVersion,
+                rawMatchData,
+                isBuildStrict
+            ].join('::')));
+
+        if (rawRouteOptions !== '') {
+            try {
                 routeOptions = eval('(' + rawRouteOptions + ')');
                 route = new Susanin.Route(routeOptions);
+                $routeOptionsError.hide();
                 $unit.fadeIn();
-            } else {
+            } catch (e) {
+                $routeOptionsError.html(e.toString()).show();
                 $unit.fadeOut();
             }
-            $routeOptionsError.hide();
-        } catch (e) {
-            $routeOptionsError.html(e.toString()).show();
+        } else {
             $unit.fadeOut();
         }
 
-        if (route) {
-            try {
-                rawMatchOptions = matchOptionsEditor.getValue();
-                if (rawMatchOptions !== '') {
-                    matchOptions = eval('(' + rawMatchOptions + ')');
-                    matchResultEditor.setValue(JSON.stringify(route.match(matchOptions), null, 4));
-                } else {
-                    matchResultEditor.setValue('');
-                }
-                $matchOptionsError.hide();
-            } catch (e) {
-                $matchOptionsError.html(e.toString()).show();
-                matchResultEditor.setValue('');
-            }
+        if ( ! route) {
+            return;
+        }
 
+        if (rawMatchPath !== '') {
             try {
-                rawBuildParams = buildParamsEditor.getValue();
-                if (rawBuildParams !== '') {
-                    buildParams = eval('(' + rawBuildParams + ')');
-                    buildResultEditor.setValue('"' + route.build(buildParams) + '"');
-                } else {
-                    buildResultEditor.setValue('');
-                }
+                matchPath = eval('(' + rawMatchPath + ')');
+                $matchPathError.hide();
+            } catch (e) {
+                $matchPathError.html(e.toString()).show();
+            }
+        } else {
+            $matchPathError.hide();
+        }
+
+        if (rawMatchData !== '') {
+            try {
+                matchData = eval('(' + rawMatchData + ')');
+                $matchDataError.hide();
+            } catch (e) {
+                $matchDataError.html(e.toString()).show();
+            }
+        } else {
+            $matchDataError.hide();
+        }
+
+        if (matchPath) {
+            try {
+                matchResult = matchData ? route.match(matchPath, matchData) : route.match(matchPath);
+                matchResultEditor.setValue(JSON.stringify(matchResult, null, 4));
+                $matchPathError.hide();
+            } catch (e) {
+                $matchPathError.html(e.toString()).show();
+            }
+        } else {
+            matchResultEditor.setValue('');
+        }
+
+        if (rawBuildParams !== '') {
+            try {
+                buildParams = eval('(' + rawBuildParams + ')');
                 $buildParamsError.hide();
+                buildResultEditor.setValue(JSON.stringify(route.build(buildParams, isBuildStrict)));
             } catch (e) {
                 $buildParamsError.html(e.toString()).show();
                 buildResultEditor.setValue('');
             }
+        } else {
+            $buildParamsError.hide();
+            buildResultEditor.setValue('');
         }
-
-        $permalink.attr(
-            'href',
-            '#' + encodeURIComponent([ rawRouteOptions, rawMatchOptions, rawBuildParams, currentVersion ].join('::')));
     }
 
     var susaninByVersion = {
@@ -104,12 +136,18 @@
         }),
         $routeOptionsError = $('#route-options-error'),
 
-        matchOptionsEditor = CodeMirror.fromTextArea(document.getElementById('match-options-textarea'), {
+        matchPathEditor = CodeMirror.fromTextArea(document.getElementById('match-path-textarea'), {
             mode : { name : 'javascript', json : true },
             lineNumbers : true,
             matchBrackets : true
         }),
-        $matchOptionsError = $('#match-options-error'),
+        $matchPathError = $('#match-path-error'),
+        matchDataEditor = CodeMirror.fromTextArea(document.getElementById('match-data-textarea'), {
+            mode : { name : 'javascript', json : true },
+            lineNumbers : true,
+            matchBrackets : true
+        }),
+        $matchDataError = $('#match-data-error'),
         matchResultEditor = CodeMirror.fromTextArea(document.getElementById('match-result-textarea'), {
             mode : { name : 'javascript', json : true },
             readOnly : true
@@ -127,9 +165,11 @@
             readOnly : true
         }),
 
+        $body = $('body'),
         $unit = $('#unit'),
         $permalink = $('#permalink'),
         $version = $('#version'),
+        $buildStrictCheckbox = $('#build-strict-checkbox'),
 
         currentVersion,
 
@@ -143,18 +183,26 @@
         ).split('::');
 
     routeOptionsEditor.setValue(values[0]);
-    matchOptionsEditor.setValue(values[1]);
+    matchPathEditor.setValue(values[1]);
     buildParamsEditor.setValue(values[2]);
     values[3] && $version.val(values[3]);
-    currentVersion = $version.val();
+    values[4] && matchDataEditor.setValue(values[4]);
+    $buildStrictCheckbox.prop('checked', values[5] === 'true');
 
+    currentVersion = $version.val();
+    $body.addClass('version_' + currentVersion);
     $version.on('change', function() {
+        $body.removeClass('version_' + currentVersion);
         currentVersion = $version.val();
+        $body.addClass('version_' + currentVersion);
         solve();
     });
 
+    $buildStrictCheckbox.on('change', solve);
+
     routeOptionsEditor.on('change', solve);
-    matchOptionsEditor.on('change', solve);
+    matchPathEditor.on('change', solve);
+    matchDataEditor.on('change', solve);
     buildParamsEditor.on('change', solve);
 
     solve();
