@@ -1,4 +1,7 @@
-# Susanin [![Build Status](https://travis-ci.org/nodules/susanin.png?branch=master)](https://travis-ci.org/nodules/susanin)
+Susanin [![NPM version][npm-image]][npm-link] ![Bower version][bower-image] [![Build status][build-image]][build-link]
+=======
+
+[![devDependency status][devdeps-image]][devdeps-link]
 
 Susanin is a routing library which can be used in any JavaScript environments.
 
@@ -170,3 +173,10 @@ console.log(route.build({ category : 'shoes' }));     // => '/products'
 
 ```
 
+[npm-image]: https://img.shields.io/npm/v/susanin.svg?style=flat
+[npm-link]: https://npmjs.org/package/susanin
+[bower-image]: https://img.shields.io/bower/v/susanin.svg?style=flat
+[build-image]: https://img.shields.io/travis/nodules/susanin.svg?style=flat
+[build-link]: https://travis-ci.org/nodules/susanin
+[devdeps-image]: https://img.shields.io/david/dev/nodules/susanin.svg?style=flat
+[devdeps-link]: https://david-dm.org/nodules/susanin#info=peerDependencies
