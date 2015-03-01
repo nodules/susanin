@@ -1,9 +1,9 @@
-Susanin [![NPM version][npm-image]][npm-link] ![Bower version][bower-image] [![Build status][build-image]][build-link]
+Susanin [![NPM version][npm-image]][npm-link] ![Bower version][bower-image] [![Build status][build-image]][build-link] [![devDependency status][devdeps-image]][devdeps-link]
 =======
 
-[![devDependency status][devdeps-image]][devdeps-link]
-
 Susanin is a routing library which can be used in any JavaScript environments.
+
+## Features
 
 ## [Demo](http://nodules.github.io/susanin)
 
@@ -17,10 +17,19 @@ In the browsers just include the file in your document:
 <script src="/path/to/susanin.min.js"></script>
 ```
 
-You can install Susanin on Node.js using [NPM](http://npmjs.org):
+You can install Susanin on Node.js using [NPM](http://npmjs.org/package/susanin):
 ```
 npm install susanin
 ```
+
+## API
+
+### Router
+
+#### router.addRoute()
+
+## Route
+
 
 ## Examples
 
