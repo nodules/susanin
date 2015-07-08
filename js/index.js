@@ -124,6 +124,11 @@
             /* borschik:include:../libs/susanin_1.0.0/dist/susanin.js */
 
             return Susanin;
+        })(),
+        '1.0.1' : (function() {
+            /* borschik:include:../libs/susanin_1.0.1/dist/susanin.js */
+
+            return Susanin;
         })()
     };
 
