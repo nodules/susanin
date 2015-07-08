@@ -56,6 +56,7 @@ describe('route.build()', function() {
             });
 
         assert.strictEqual(route.build(), '/opa/value');
+        assert.strictEqual(route.build({ param : 'value' }), '/opa/value');
         assert.strictEqual(route.build({ param : 'bar' }), '/opa/bar');
         assert.strictEqual(route.build({ param : 'bar', foo1 : [ 'bar1', 'bar2' ], foo2 : [ 'bar3' ] }),
             '/opa/bar?foo1=bar1&foo1=bar2&foo2=bar3');
@@ -83,6 +84,7 @@ describe('route.build()', function() {
             });
 
         assert.strictEqual(route.build(), '/opa');
+        assert.strictEqual(route.build({ param : 'value' }), '/opa');
         assert.strictEqual(route.build({ param : 'bar' }), '/opa/opapa/bar');
         assert.strictEqual(route.build({ param : 'bar', foo1 : [ 'bar1', 'bar2' ], foo2 : [ 'bar3' ] }),
             '/opa/opapa/bar?foo1=bar1&foo1=bar2&foo2=bar3');
@@ -113,9 +115,37 @@ describe('route.build()', function() {
         });
 
         assert.strictEqual(route.build(), '/opa');
+        assert.strictEqual(route.build({ param1 : 'value1' }), '/opa');
+        assert.strictEqual(route.build({ param2 : 'value2' }), '/opa');
         assert.strictEqual(route.build({ param1 : 'bar' }), '/opa/opapa/bar');
         assert.strictEqual(route.build({ param2 : 'bar' }), '/opa/bar');
+        assert.strictEqual(route.build({ param1 : 'value1', param2 : 'value2' }), '/opa');
+        assert.strictEqual(route.build({ param1 : 'value1', param2 : 'bar' }), '/opa/bar');
+        assert.strictEqual(route.build({ param1 : 'bar', param2 : 'value2' }), '/opa/opapa/bar');
         assert.strictEqual(route.build({ param1 : 'bar1', param2 : 'bar2' }), '/opa/opapa/bar1/bar2');
+        assert.strictEqual(route.build({ param1 : 'bar', foo1 : [ 'bar1', 'bar2' ], foo2 : [ 'bar3' ] }),
+            '/opa/opapa/bar?foo1=bar1&foo1=bar2&foo2=bar3');
+
+        done();
+    });
+
+    it('/opa(/opapa/<param1>(/<param2>)) and defaults', function(done) {
+        var route = Route({
+            pattern : '/opa(/opapa/<param1>(/<param2>))',
+            defaults : {
+                param1 : 'value1',
+                param2 : 'value2'
+            }
+        });
+
+        assert.strictEqual(route.build(), '/opa');
+        assert.strictEqual(route.build({ param1 : 'value1' }), '/opa');
+        assert.strictEqual(route.build({ param2 : 'value2' }), '/opa');
+        assert.strictEqual(route.build({ param1 : 'bar' }), '/opa/opapa/bar');
+        assert.strictEqual(route.build({ param2 : 'bar' }), '/opa/opapa/value1/bar');
+        assert.strictEqual(route.build({ param1 : 'value1', param2 : 'value2' }), '/opa');
+        assert.strictEqual(route.build({ param1 : 'value1', param2 : 'bar' }), '/opa/opapa/value1/bar');
+        assert.strictEqual(route.build({ param1 : 'bar', param2 : 'value2' }), '/opa/opapa/bar');
         assert.strictEqual(route.build({ param1 : 'bar', foo1 : [ 'bar1', 'bar2' ], foo2 : [ 'bar3' ] }),
             '/opa/opapa/bar?foo1=bar1&foo1=bar2&foo2=bar3');
 

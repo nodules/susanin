@@ -327,7 +327,8 @@ Route.prototype._parsePattern = function(pattern, isOptional) {
         i = 0, j, size,
         countOpened = 0,
         isFindingClosed = false,
-        length = pattern.length;
+        length = pattern.length,
+        what;
 
     while (i < length) {
         character = pattern.charAt(i++);
@@ -354,8 +355,12 @@ Route.prototype._parsePattern = function(pattern, isOptional) {
                     parts.push(part);
 
                     for (j = 0, size = part.parts.length; j < size; ++j) {
-                        if (part.parts[j] && part.parts[j].what === 'param') {
+                        what = part.parts[j] && part.parts[j].what;
+
+                        if (what === 'param') {
                             part.dependOnParams.push(part.parts[j].name);
+                        } else if (what === 'optional') {
+                            part.dependOnParams.push.apply(part.dependOnParams, part.parts[j].dependOnParams);
                         }
                     }
 
