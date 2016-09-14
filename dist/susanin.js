@@ -46,8 +46,9 @@ var querystring = {
     parse : function(query, sep, eq) {
         var params = {},
             queryParams,
-            tmp, value, key,
-            i, size;
+            value, key,
+            i, size,
+            pair, idx;
 
         if (typeof query !== 'string' || query === '') {
             return params;
@@ -59,9 +60,16 @@ var querystring = {
         queryParams = query.split(sep);
 
         for (i = 0, size = queryParams.length; i < size; ++i) {
-            tmp = queryParams[i].split(eq);
-            value = typeof tmp[1] !== 'undefined' ? querystring.decode(tmp[1]) : '';
-            key = querystring.decode(tmp[0]);
+            pair = querystring.decode(queryParams[i]);
+            idx = pair.indexOf(eq);
+
+            if (idx >= 0) {
+                key = pair.substr(0, idx);
+                value = pair.substr(idx + 1);
+            } else {
+                key = pair;
+                value = '';
+            }
 
             if (hasOwnProp.call(params, key)) {
                 if ( ! isArray(params[key])) {
@@ -255,8 +263,8 @@ var QUERY_STRING_PARAM_NAME = 'qs_' + EXPANDO;
  * @property {Object} [conditions] Conditions for params in pattern
  * @property {Object} [defaults] Defaults values for params in pattern
  * @property {Object} [data] Data that will be bonded with route
- * @property {Function} [filterMatch] Function that will be applied after match method with its result
- * @property {Function} [filterBuild] Function that will be applied before build method with input params
+ * @property {Function} [postMatch] Function that will be applied after match method with its result
+ * @property {Function} [preBuild] Function that will be applied before build method with input params
  * @property {Boolean} [isTrailingSlashOptional=true] If `true` trailing slash is optional
  * @property {Boolean} [useQueryString=true] If `true` query string will be parsed and returned
  */

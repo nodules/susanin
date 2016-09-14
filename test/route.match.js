@@ -240,6 +240,7 @@ describe('route.match()', function() {
         assert.deepEqual(route.match('/opa'), null);
         assert.deepEqual(route.match('/opa/value'), { query_string : 'value' });
         assert.deepEqual(route.match('/opa/value?foo=bar'), { query_string : 'value', foo : 'bar' });
+        assert.deepEqual(route.match('/opa/value?foo=bar&baz=clever=param'), { query_string : 'value', foo : 'bar', baz : 'clever=param' });
 
         done();
     });
