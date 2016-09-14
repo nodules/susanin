@@ -25,6 +25,7 @@ describe('querystring module', function() {
         assert.deepEqual(qs.parse('bla=foo1&bla=foo2'), { bla : [ 'foo1', 'foo2' ] });
         assert.deepEqual(qs.parse('bla=foo1&bla=foo2&bla=foo3'), { bla : [ 'foo1', 'foo2', 'foo3' ] });
         assert.deepEqual(qs.parse('bla=foo&bla1=foo1'), { bla : 'foo', bla1 : 'foo1' });
+        assert.deepEqual(qs.parse('bla=foo&bla1=foo1=foo2'), { bla : 'foo', bla1 : 'foo1=foo2' });
 
         done();
     });
@@ -55,6 +56,7 @@ describe('querystring module', function() {
         assert.strictEqual(qs.stringify({ bla : 'foo', bla1 : 'foo1' }), 'bla=foo&bla1=foo1');
         assert.strictEqual(qs.stringify(new Params()), 'bla=foo');
         assert.strictEqual(qs.stringify([ 1, 2, 3 ]), '0=1&1=2&2=3');
+        assert.strictEqual(qs.stringify({ bla : 'foo', bla1 : 'foo1=foo2' }), 'bla=foo&bla1=foo1%3Dfoo2');
 
         done();
     });
