@@ -29,7 +29,7 @@
         defineAsGlobal = true;
 
     // CommonJS
-    if (global.module && typeof module.exports === 'object') {
+    if (typeof exports === 'object' && typeof exports.nodeName !== 'string') {
         module.exports = Router;
         defineAsGlobal = false;
     }
