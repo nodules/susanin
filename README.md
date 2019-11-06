@@ -61,6 +61,20 @@ console.log(route.match('/products'));           // => {}
 console.log(route.match('/products/321'));       // => { id : '321' }
 ```
 
+* With multiple patterns:
+
+```javascript
+var route = Susanin.Route({
+    pattern: [
+        { name: 'products', test: '/products(/<id>)' },
+        { name: 'productsWithSize', test: '/products/<id>/<size>' }
+    ]
+}));
+
+console.log(route.match('/products/321'));        // => { id: '321' }
+console.log(route.match('/products/321/xxl'));    // => { id: '321', size: 'xxl' }
+```
+
 * With a default value of param:
 
 ```javascript
