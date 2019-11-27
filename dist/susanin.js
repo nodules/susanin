@@ -107,6 +107,10 @@ var querystring = {
         sep || (sep = '&');
         eq || (eq = '=');
 
+        var urlSymbolsReplacer = function(c) {
+            return '%' + c.charCodeAt(0).toString(16);
+        };
+
         for (key in params) {
             if (hasOwnProp.call(params, key)) {
                 tmpArray = [].concat(params[key]);
@@ -116,7 +120,9 @@ var querystring = {
                     if (typeOf === 'object' || typeOf === 'undefined') {
                         value = '';
                     } else {
-                        value = encodeURIComponent(tmpArray[i]);
+                        value = encodeURIComponent(tmpArray[i])
+                            // https://tools.ietf.org/html/rfc3986
+                            .replace(/[!'()*]/g, urlSymbolsReplacer);
                     }
 
                     query += sep + encodeURIComponent(key) + eq + value;
