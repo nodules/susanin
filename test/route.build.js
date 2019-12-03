@@ -182,4 +182,44 @@ describe('route.build()', function() {
         done();
     });
 
+    it('Support of multiple patterns', function(done) {
+        var route = Route({
+            patterns : [
+                '/search',
+                '/search/mark-<mark>',
+                '/search/mark-<mark>/year-<year>',
+                '/search/mark-<mark>(/<model>)',
+                '/search/mark-<mark>/<model>',
+                '/search/mark-<mark>(/<model>)/year-<year>',
+                '/search/mark-<mark>/price-<price>'
+            ]
+        });
+
+        assert.strictEqual(route.build(), '/search');
+        assert.strictEqual(route.build({}), '/search');
+        assert.strictEqual(route.build({}, true), '/search');
+        assert.strictEqual(route.build({ foo : 'bar' }), '/search?foo=bar');
+        assert.strictEqual(route.build({ foo : 'bar' }, true), '/search?foo=bar');
+        assert.strictEqual(route.build({ model : 'corona' }), '/search/mark-/corona');
+        assert.strictEqual(route.build({ model : 'corona' }, true), '/search?model=corona');
+        assert.strictEqual(route.build({ year : '1993' }), '/search/mark-/year-1993');
+        assert.strictEqual(route.build({ year : '1993' }, true), '/search?year=1993');
+        assert.strictEqual(route.build({ model : 'toyota', year : '1993' }), '/search/mark-/toyota/year-1993');
+        assert.strictEqual(route.build({ model : 'toyota', year : '1993' }, true), '/search?model=toyota&year=1993');
+        assert.strictEqual(route.build({ mark : 'toyota' }), '/search/mark-toyota');
+        assert.strictEqual(route.build({ mark : 'toyota' }, true), '/search/mark-toyota');
+        assert.strictEqual(route.build({ mark : 'toyota', foo : 'bar' }), '/search/mark-toyota?foo=bar');
+        assert.strictEqual(route.build({ mark : 'toyota', foo : 'bar' }, true), '/search/mark-toyota?foo=bar');
+        assert.strictEqual(route.build({ mark : 'toyota', year : 1993 }), '/search/mark-toyota/year-1993');
+        assert.strictEqual(route.build({ mark : 'toyota', year : 1993 }, true), '/search/mark-toyota/year-1993');
+        assert.strictEqual(route.build({ mark : 'toyota', model : 'corona' }), '/search/mark-toyota/corona');
+        assert.strictEqual(route.build({ mark : 'toyota', model : 'corona' }, true), '/search/mark-toyota/corona');
+        assert.strictEqual(route.build({ mark : 'toyota', model : 'corona', year : 1993 }), '/search/mark-toyota/corona/year-1993');
+        assert.strictEqual(route.build({ mark : 'toyota', model : 'corona', year : 1993 }, true), '/search/mark-toyota/corona/year-1993');
+        assert.strictEqual(route.build({ mark : 'toyota', price : 20000 }), '/search/mark-toyota/price-20000');
+        assert.strictEqual(route.build({ mark : 'toyota', price : 20000 }, true), '/search/mark-toyota/price-20000');
+
+        done();
+    });
+
 });

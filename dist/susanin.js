@@ -257,9 +257,22 @@ var TRAILING_SLASH_PARAM_VALUE_ESCAPED = escape('/');
 var QUERY_STRING_PARAM_NAME = 'qs_' + EXPANDO;
 
 /**
+ * @const
+ * @type {number}
+ */
+var OPTIONAL_PARAM_WEIGHT = 1;
+
+/**
+ * @const
+ * @type {number}
+ */
+var REQUIRED_PARAM_WEIGHT = 2;
+
+/**
  * @typedef {Object|String} RouteOptions If it's a string it means pattern for path match
  * @property {String} [name] Name of the route
- * @property {String} pattern Pattern for path match
+ * @property {String} [pattern] Pattern for path match
+ * @property {String[]} [patterns] Patterns for path match
  * @property {Object} [conditions] Conditions for params in pattern
  * @property {Object} [defaults] Defaults values for params in pattern
  * @property {Object} [data] Data that will be bonded with route
@@ -280,13 +293,19 @@ function Route(options) {
     }
 
     typeof options === 'string' && (options = { pattern : options });
+    isArray(options) && (options = { patterns : options });
+
+    if (! isArray(options.patterns)) {
+        options.patterns = [];
+    }
+
+    if (options.pattern) {
+        options.patterns.push(options.pattern);
+        delete options.pattern;
+    }
 
     if ( ! options || typeof options !== 'object') {
         throw new Error('You must specify options');
-    }
-
-    if (typeof options.pattern !== 'string') {
-        throw new Error('You must specify the pattern of the route');
     }
 
     /**
@@ -297,38 +316,58 @@ function Route(options) {
     this._conditions = options.conditions && typeof options.conditions === 'object' ? options.conditions : {};
 
     if (options.isTrailingSlashOptional !== false) {
-        options.pattern += GROUP_OPENED_CHAR + PARAM_OPENED_CHAR +
-            TRAILING_SLASH_PARAM_NAME +
-            PARAM_CLOSED_CHAR + GROUP_CLOSED_CHAR;
         this._conditions[TRAILING_SLASH_PARAM_NAME] = TRAILING_SLASH_PARAM_VALUE_ESCAPED;
     }
 
-    options.pattern += GROUP_OPENED_CHAR +
-        '?' + PARAM_OPENED_CHAR + QUERY_STRING_PARAM_NAME + PARAM_CLOSED_CHAR +
-        GROUP_CLOSED_CHAR;
     this._conditions[QUERY_STRING_PARAM_NAME] = '.*';
 
-    this._paramsMap = [];
-    this._mainParamsMap = {};
-    this._requiredParams = [];
+    this._subPatterns = [];
 
-    /**
-     * @type {Array}
-     * @private
-     */
-    this._parts = this._parsePattern(options.pattern);
+    for (var i = 0, l = options.patterns.length; i < l; i++) {
+        var pattern = options.patterns[i];
+        var subPattern = {};
 
-    this._buildParseRegExp();
-    this._buildBuildFn();
+        if (typeof pattern !== 'string') {
+            throw new Error('You must specify the pattern of the route');
+        } else {
+            if (options.isTrailingSlashOptional !== false) {
+                pattern += GROUP_OPENED_CHAR + PARAM_OPENED_CHAR +
+                    TRAILING_SLASH_PARAM_NAME +
+                    PARAM_CLOSED_CHAR + GROUP_CLOSED_CHAR;
+            }
+
+            pattern += GROUP_OPENED_CHAR +
+                '?' + PARAM_OPENED_CHAR + QUERY_STRING_PARAM_NAME + PARAM_CLOSED_CHAR +
+                GROUP_CLOSED_CHAR;
+
+            subPattern._pattern = pattern;
+            subPattern._paramsMap = [];
+            subPattern._mainParamsMap = {};
+            subPattern._requiredParams = [];
+            subPattern._optionalParams = [];
+
+            /**
+             * @type {Array}
+             * @private
+             */
+            subPattern._parts = this._parsePattern(subPattern, pattern);
+
+            this._buildParseRegExp(subPattern);
+            this._buildBuildFn(subPattern);
+
+            this._subPatterns.push(subPattern);
+        }
+    }
 }
 
 /**
+ * @param {Object} subPattern
  * @param {String} pattern
  * @param {Boolean} [isOptional=false]
  * @returns {Array}
  * @private
  */
-Route.prototype._parsePattern = function(pattern, isOptional) {
+Route.prototype._parsePattern = function(subPattern, pattern, isOptional) {
     var parts = [],
         part = '',
         character,
@@ -346,7 +385,7 @@ Route.prototype._parsePattern = function(pattern, isOptional) {
                 ++countOpened;
                 part += character;
             } else {
-                this._parseParams(part, parts, isOptional);
+                this._parseParams(subPattern, part, parts, isOptional);
                 part = '';
                 countOpened = 0;
                 isFindingClosed = true;
@@ -357,7 +396,7 @@ Route.prototype._parsePattern = function(pattern, isOptional) {
                     part = {
                         what : 'optional',
                         dependOnParams : [],
-                        parts : this._parsePattern(part, true)
+                        parts : this._parsePattern(subPattern, part, true)
                     };
 
                     parts.push(part);
@@ -386,18 +425,19 @@ Route.prototype._parsePattern = function(pattern, isOptional) {
         }
     }
 
-    this._parseParams(part, parts, isOptional);
+    this._parseParams(subPattern, part, parts, isOptional);
 
     return parts;
 };
 
 /**
+ * @param {Object} subPattern
  * @param {String} pattern
  * @param {Array} parts
  * @param {Boolean} isOptional
  * @private
  */
-Route.prototype._parseParams = function(pattern, parts, isOptional) {
+Route.prototype._parseParams = function(subPattern, pattern, parts, isOptional) {
     var matches = pattern.match(PARSE_PARAMS_REGEXP),
         i, size,
         part,
@@ -409,9 +449,14 @@ Route.prototype._parseParams = function(pattern, parts, isOptional) {
 
             if (part.charAt(0) === PARAM_OPENED_CHAR && part.charAt(part.length - 1) === PARAM_CLOSED_CHAR) {
                 paramName = part.substr(1, part.length - 2);
-                this._paramsMap.push(paramName);
-                this._mainParamsMap[paramName] = true;
-                isOptional || this._requiredParams.push(paramName);
+                subPattern._paramsMap.push(paramName);
+                subPattern._mainParamsMap[paramName] = true;
+
+                if (isOptional) {
+                    subPattern._optionalParams.push(paramName);
+                } else {
+                    subPattern._requiredParams.push(paramName);
+                }
 
                 parts.push({
                     what : 'param',
@@ -427,9 +472,9 @@ Route.prototype._parseParams = function(pattern, parts, isOptional) {
 /**
  * @private
  */
-Route.prototype._buildParseRegExp = function() {
-    this._parseRegExpSource = '^' + this._buildParseRegExpParts(this._parts) + '$';
-    this._parseRegExp = new RegExp(this._parseRegExpSource);
+Route.prototype._buildParseRegExp = function(subPattern) {
+    subPattern._parseRegExpSource = '^' + this._buildParseRegExpParts(subPattern._parts) + '$';
+    subPattern._parseRegExp = new RegExp(subPattern._parseRegExpSource);
 };
 
 /**
@@ -514,24 +559,30 @@ Route.prototype._checkParamValue = function(paramName, paramValue) {
 };
 
 /**
+ * @param {Object} subPattern
  * @private
  */
-Route.prototype._buildBuildFn = function() {
-    this._buildFnSource = 'var h=({}).hasOwnProperty;return ' + this._buildBuildFnParts(this._parts) + ';';
+Route.prototype._buildBuildFn = function(subPattern) {
+    subPattern._buildFnSource = 'var h=({}).hasOwnProperty;return ' + this._buildBuildFnParts(subPattern) + ';';
     /*jshint evil:true */
-    this._buildFn = new Function('p', this._buildFnSource);
+    subPattern._buildFn = new Function('p', subPattern._buildFnSource);
 };
 
 /**
- * @param {Array} parts
+ * @param {Object} subPattern
+ * @param {?Object} parts
  * @returns {String}
  * @private
  */
-Route.prototype._buildBuildFnParts = function(parts) {
+Route.prototype._buildBuildFnParts = function(subPattern, parts) {
     var ret = '""',
         i, sizeI, j, sizeJ,
         part, name,
         defaults = this._options.defaults;
+
+    if (! parts) {
+        parts = subPattern._parts;
+    }
 
     for (i = 0, sizeI = parts.length; i < sizeI; ++i) {
         part = parts[i];
@@ -539,7 +590,7 @@ Route.prototype._buildBuildFnParts = function(parts) {
         if (typeof part === 'string') {
             ret += '+"' + escape(part) + '"' ;
         } else if (part.what === 'param') {
-            this._mainParamsMap[part.name] = true;
+            subPattern._mainParamsMap[part.name] = true;
             ret += '+(h.call(p,"' + escape(part.name) + '")?' +
                 'p["' + escape(part.name) + '"]:' +
                 (defaults && has(defaults, part.name) ?
@@ -560,7 +611,7 @@ Route.prototype._buildBuildFnParts = function(parts) {
                     ')';
             }
 
-            ret += ')?(' + this._buildBuildFnParts(part.parts) + '):"")';
+            ret += ')?(' + this._buildBuildFnParts(subPattern, part.parts) + '):"")';
         }
     }
 
@@ -592,14 +643,110 @@ Route.prototype._isDataMatched = function(data) {
 };
 
 /**
+ * @param {Array} patternParams
+ * @param {Object} params
+ * @return {Array}
+ * @private
+ */
+Route.prototype._getPatternParamsIntersection = function(patternParams, params) {
+    var intersection = [],
+        paramIndex,
+        size,
+        paramName;
+
+    for (paramIndex = 0, size = patternParams.length; paramIndex < size; paramIndex++) {
+        paramName = patternParams[paramIndex];
+
+        if (has(params, paramName)) {
+            intersection.push(paramName);
+        }
+    }
+
+    return intersection;
+};
+
+/**
+ * @param {Object} subPattern
+ * @param {Object} params
+ * @param {?Boolean} [isStrict=false]
+ * @return {number}
+ * @private
+ */
+Route.prototype._getParamsWeight = function(subPattern, params, isStrict) {
+    var mainParams = subPattern._paramsMap;
+    var requiredParams = subPattern._requiredParams;
+    var optionalParams = subPattern._optionalParams;
+    var weight = 0;
+    var paramsIntersection;
+
+    if (isStrict) {
+        paramsIntersection = this._getPatternParamsIntersection(requiredParams, params);
+
+        if (requiredParams.length !== paramsIntersection.length) {
+            return weight;
+        }
+
+        paramsIntersection = this._getPatternParamsIntersection(optionalParams, params);
+        weight = paramsIntersection.length * OPTIONAL_PARAM_WEIGHT +
+            requiredParams.length * REQUIRED_PARAM_WEIGHT;
+    } else {
+        paramsIntersection = this._getPatternParamsIntersection(mainParams, params);
+
+        weight = paramsIntersection.length * REQUIRED_PARAM_WEIGHT;
+    }
+
+    if ( ! weight) {
+        weight = 1;
+    }
+
+    return weight;
+};
+
+/**
  * Matches path with route
  * @param {String} path
  * @param {Function|Object} [data]
  * @returns {Object|null}
  */
 Route.prototype.match = function(path, data) {
-    var ret = null,
-        matches,
+    var bestParams = null;
+
+    if (typeof path !== 'string' || (data && ! this._isDataMatched(data))) {
+        return bestParams;
+    }
+
+    var subPatterns = this._subPatterns;
+    var bestsubPattern;
+    var bestParamsWeight = 0;
+
+    for (var i = 0, l = subPatterns.length; i < l; i++) {
+        var subPattern = subPatterns[i];
+
+        var resultParams = this._matchsubPattern(subPattern, path);
+
+        if (resultParams) {
+            var paramsWeight = this._getParamsWeight(subPattern, resultParams);
+
+            if (paramsWeight >= bestParamsWeight) {
+                bestParamsWeight = paramsWeight;
+                bestsubPattern = subPattern;
+                bestParams = resultParams;
+            }
+        }
+    }
+
+    return bestParams;
+};
+
+/**
+ * @param {Object} subPattern
+ * @param {String} path
+ * @return {null|Object}
+ * @private
+ */
+Route.prototype._matchsubPattern = function(subPattern, path) {
+    var matches,
+        ret = null,
         i, size,
         paramName,
         paramValue,
@@ -609,18 +756,14 @@ Route.prototype.match = function(path, data) {
         filter = options.postMatch,
         defaults = options.defaults;
 
-    if (typeof path !== 'string' || (data && ! this._isDataMatched(data))) {
-        return ret;
-    }
-
-    matches = path.match(this._parseRegExp);
+    matches = path.match(subPattern._parseRegExp);
 
     if (matches) {
         ret = {};
 
         for (i = 1, size = matches.length; i < size; ++i) {
             if (typeof matches[i] !== 'undefined' && /* for IE lt 9*/ matches[i] !== '') {
-                paramName = this._paramsMap[i - 1];
+                paramName = subPattern._paramsMap[i - 1];
                 if (paramName === QUERY_STRING_PARAM_NAME) {
                     queryString = matches[i];
                 } else if (paramName === TRAILING_SLASH_PARAM_NAME) {
@@ -638,12 +781,13 @@ Route.prototype.match = function(path, data) {
             for (paramName in queryParams) {
                 if (has(queryParams, paramName) && ! has(ret, paramName)) {
                     paramValue = queryParams[paramName];
-                    if (this._mainParamsMap[paramName] && isArray(paramValue)) {
+                    if (subPattern._mainParamsMap[paramName] && isArray(paramValue)) {
                         paramValue = paramValue[0];
                     }
 
                     if (isArray(paramValue)) {
                         ret[paramName] = [];
+
                         for (i = 0, size = paramValue.length; i < size; ++i) {
                             if (this._checkParamValue(paramName, paramValue[i])) {
                                 ret[paramName].push(paramValue[i]);
@@ -680,6 +824,59 @@ Route.prototype.match = function(path, data) {
  * @returns {?String}
  */
 Route.prototype.build = function(params, isStrict) {
+    var subPatterns = this._subPatterns;
+    var bestParams;
+    var bestsubPattern;
+    var bestParamsWeight = 0;
+
+    params || (params = {});
+
+    if (subPatterns.length > 1) {
+        for (var i = 0, l = subPatterns.length; i < l; i++) {
+            var subPattern = subPatterns[i];
+
+            var resultParams = this._buildsubPatternParams(subPattern, params, isStrict);
+
+            if (resultParams) {
+                var paramsWeight = this._getParamsWeight(subPattern, params, isStrict);
+
+                if (paramsWeight > bestParamsWeight) {
+                    bestParamsWeight = paramsWeight;
+                    bestsubPattern = subPattern;
+                    bestParams = resultParams;
+                }
+            }
+        }
+    } else {
+        bestsubPattern = subPatterns[0];
+        bestParams = this._buildsubPatternParams(bestsubPattern, params, isStrict);
+    }
+
+    if (bestParams) {
+        return this._buildsubPattern(bestsubPattern, bestParams);
+    }
+
+    return null;
+};
+
+/**
+ * @param {Object} subPattern
+ * @param {Object} params
+ * @return {String}
+ * @private
+ */
+Route.prototype._buildsubPattern = function(subPattern, params) {
+    return subPattern._buildFn(params);
+};
+
+/**
+ * @param {Object} subPattern
+ * @param {Object} params
+ * @param {?Boolean} [isStrict=false]
+ * @return {null|Object}
+ * @private
+ */
+Route.prototype._buildsubPatternParams = function(subPattern, params, isStrict) {
     var options = this._options,
         newParams = {},
         useQueryString = options.useQueryString !== false,
@@ -699,20 +896,20 @@ Route.prototype.build = function(params, isStrict) {
             has(params, paramName) &&
                 params[paramName] !== null &&
                 typeof params[paramName] !== 'undefined' &&
-                (this._mainParamsMap[paramName] || useQueryString)
+                (subPattern._mainParamsMap[paramName] || useQueryString)
         ) {
             paramValue = params[paramName];
             if (isStrict && ! this._checkParamValue(paramName, paramValue)) {
                 return null;
             }
 
-            (this._mainParamsMap[paramName] ? newParams : queryParams)[paramName] = paramValue;
+            (subPattern._mainParamsMap[paramName] ? newParams : queryParams)[paramName] = paramValue;
         }
     }
 
     if (isStrict) {
-        for (i = 0, size = this._requiredParams.length; i < size; ++i) {
-            if ( ! has(newParams, this._requiredParams[i])) {
+        for (i = 0, size = subPattern._requiredParams.length; i < size; ++i) {
+            if ( ! has(newParams, subPattern._requiredParams[i])) {
                 return null;
             }
         }
@@ -723,7 +920,7 @@ Route.prototype.build = function(params, isStrict) {
         queryString && (newParams[QUERY_STRING_PARAM_NAME] = queryString);
     }
 
-    return this._buildFn(newParams);
+    return newParams;
 };
 
 /**
