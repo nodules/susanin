@@ -251,10 +251,10 @@ describe('route.match()', function() {
                 '/search',
                 '/search/mark-<mark>',
                 '/search/mark-<mark>/year-<year>',
+                '/search/mark-<mark>/price-<price>',
                 '/search/mark-<mark>(/<model>)',
                 '/search/mark-<mark>/<model>',
-                '/search/mark-<mark>(/<model>)/year-<year>',
-                '/search/mark-<mark>/price-<price>'
+                '/search/mark-<mark>(/<model>)/year-<year>'
             ]
         });
 
