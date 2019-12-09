@@ -821,9 +821,12 @@ Route.prototype.build = function(params, isStrict) {
             var defaultParams = this._getDefaults(subRoute);
             var requiredParamsIntersection = this._getPatternParamsIntersection(requiredParams, params, defaultParams);
 
-            if (requiredParamsIntersection.length === requiredParams.length || ! isStrict && isLastSubRoute) {
-                var resultParams = this._buildSubPatternParams(subRoute, params, isStrict);
+            var resultParams = this._buildSubPatternParams(subRoute, params, isStrict);
 
+            if (
+                requiredParamsIntersection.length === requiredParams.length && resultParams ||
+                ! isStrict && isLastSubRoute
+            ) {
                 if (isStrict || resultParams || ! isStrict && isLastSubRoute) {
                     selectedSubRoute = subRoute;
                     selectedParams = resultParams;
