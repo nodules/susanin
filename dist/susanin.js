@@ -331,13 +331,11 @@ function Route(options) {
             subRoute.requiredParams = [];
             subRoute.optionalParams = [];
 
-            if (subRouteOptions.conditions) {
-                subRoute.conditions = this._setConditions(subRouteOptions.conditions);
-            }
+            subRoute.conditions = subRouteOptions.conditions ?
+                this._setConditions(subRouteOptions.conditions) :
+                this._conditions;
 
-            if (subRouteOptions.defaults) {
-                subRoute.defaults = subRouteOptions.defaults;
-            }
+            subRoute.defaults = subRouteOptions.defaults || this._options.defaults;
 
             /**
              * @type {Array}
@@ -354,7 +352,7 @@ function Route(options) {
 }
 
 Route.prototype._getDefaults = function(subRoute) {
-    return subRoute.defaults || this._options.defaults;
+    return subRoute.defaults;
 };
 
 Route.prototype._setConditions = function(conditions) {
@@ -519,14 +517,10 @@ Route.prototype._buildParseRegExpParts = function(subRoute, parts) {
 Route.prototype._getParamValueRegExpSource = function(subRoute, paramName) {
     var regExpSource,
         regExpSources,
-        conditions = subRoute.conditions || this._conditions,
+        conditions = subRoute.conditions,
         condition;
 
-    if (subRoute.conditions) {
-        regExpSources = subRoute.conditionRegExpSources || (subRoute.conditionRegExpSources = {});
-    } else {
-        regExpSources = this._conditionRegExpSources || (this._conditionRegExpSources = {});
-    }
+    regExpSources = subRoute.conditionRegExpSources || (subRoute.conditionRegExpSources = {});
 
     if ( ! has(regExpSources, paramName)) {
         if (has(conditions, paramName)) {
@@ -790,7 +784,7 @@ Route.prototype._matchSubPattern = function(subRoute, path) {
     }
 
     if (ret && typeof filter === 'function') {
-        ret = filter(ret);
+        ret = filter(ret, subRoute);
         if ( ! (ret && typeof ret === 'object')) {
             ret = null;
         }
@@ -819,9 +813,10 @@ Route.prototype.build = function(params, isStrict) {
             var subRoute = subRoutes[i];
             var requiredParams = subRoute.requiredParams;
             var defaultParams = this._getDefaults(subRoute);
-            var requiredParamsIntersection = this._getPatternParamsIntersection(requiredParams, params, defaultParams);
 
             var resultParams = this._buildSubPatternParams(subRoute, params, isStrict);
+
+            var requiredParamsIntersection = this._getPatternParamsIntersection(requiredParams, resultParams || {}, defaultParams);
 
             if (
                 requiredParamsIntersection.length === requiredParams.length && resultParams ||
@@ -874,10 +869,13 @@ Route.prototype._buildSubPatternParams = function(subRoute, params, isStrict) {
         paramName,
         paramValue,
         filter = options.preBuild,
-        i, size;
+        i, size,
+        subRoutesLength = this._subRoutes.length,
+        hasManySubRoutes = subRoutesLength > 1,
+        isLastSubRoute = this._subRoutes.indexOf(subRoute) === subRoutesLength - 1;
 
     if (typeof filter === 'function') {
-        params = filter(params);
+        params = filter(params, subRoute);
     }
 
     for (paramName in params) {
@@ -888,7 +886,7 @@ Route.prototype._buildSubPatternParams = function(subRoute, params, isStrict) {
                 (subRoute.mainParamsMap[paramName] || useQueryString)
         ) {
             paramValue = params[paramName];
-            if (isStrict && ! this._checkParamValue(subRoute, paramName, paramValue)) {
+            if ((isStrict || hasManySubRoutes && ! isLastSubRoute) && ! this._checkParamValue(subRoute, paramName, paramValue)) {
                 return null;
             }
 

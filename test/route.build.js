@@ -272,8 +272,8 @@ describe('route.build(): Support of multiple patterns', function() {
         });
 
         assert.strictEqual(route.build({ 'sub-year' : 2000 }), '/search/year-sub-2000');
-        assert.strictEqual(route.build({ 'sub-year' : 20 }), '/search/year-sub-20');
-        assert.strictEqual(route.build({ 'sub-year' : 20 }, true), null);
+        assert.strictEqual(route.build({ 'sub-year' : 20 }), '/search/year-?sub-year=20');
+        assert.strictEqual(route.build({ 'sub-year' : 40 }, true), null);
         assert.strictEqual(route.build({ year : 10 }, true), '/search/year-10');
     });
 });
