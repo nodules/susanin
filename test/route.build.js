@@ -183,3 +183,97 @@ describe('route.build()', function() {
     });
 
 });
+
+describe('route.build(): Support of multiple patterns', function() {
+    var Route = Router.Route;
+
+    it('non strict', function() {
+        var route = Route({
+            patterns : [
+                {
+                    pattern : '/search/mark-<mark>(/<model>)/year-<year>'
+                },
+                '/search/mark-<mark>/price-<price>',
+                '/search/mark-<mark>(/<model>)',
+                '/search'
+            ]
+        });
+
+        var route2 = Route({
+            patterns : [
+                '/search/mark-<mark>/model-<model>',
+                '/search/mark-<mark>/year-<year>',
+            ]
+        });
+
+        assert.strictEqual(route.build(), '/search');
+        assert.strictEqual(route2.build(), '/search/mark-/year-');
+        assert.strictEqual(route2.build({ mark : 'vaz', model : '2106' }), '/search/mark-vaz/model-2106');
+        assert.strictEqual(route2.build({ mark : 'vaz', year : '2000' }), '/search/mark-vaz/year-2000');
+        assert.strictEqual(route.build({ foo : 'bar', model : '2106' }), '/search?foo=bar&model=2106');
+        assert.strictEqual(route.build({ foo : 'bar', model : '2106', mark : 'vaz' }), '/search/mark-vaz/2106?foo=bar');
+        assert.strictEqual(route.build({ foo : 'bar', model : '2106', mark : 'vaz', year : '1812' }), '/search/mark-vaz/2106/year-1812?foo=bar');
+        assert.strictEqual(route.build({ foo : 'bar', model : '2106', mark : 'vaz', year : '1812', price : 100500 }), '/search/mark-vaz/2106/year-1812?foo=bar&price=100500');
+        assert.strictEqual(route.build({ foo : 'bar', model : '2106', mark : 'vaz', price : 100500 }), '/search/mark-vaz/price-100500?foo=bar&model=2106');
+    });
+
+    it('strict', function() {
+        var route = Route({
+            patterns : [
+                '/search/mark-<mark>(/<model>)/year-<year>',
+                '/search/mark-<mark>/price-<price>',
+                '/search/mark-<mark>(/<model>)',
+            ]
+        });
+
+        assert.strictEqual(route.build({}, true), null);
+        assert.strictEqual(route.build({ foo : 'bar', model : '2106' }, true), null);
+        assert.strictEqual(route.build({ foo : 'bar', model : '2106', mark : 'vaz' }, true), '/search/mark-vaz/2106?foo=bar');
+        assert.strictEqual(route.build({ foo : 'bar', model : '2106', mark : 'vaz', year : '1812' }, true), '/search/mark-vaz/2106/year-1812?foo=bar');
+        assert.strictEqual(route.build({ foo : 'bar', model : '2106', mark : 'vaz', year : '1812', price : 100500 }, true), '/search/mark-vaz/2106/year-1812?foo=bar&price=100500');
+        assert.strictEqual(route.build({ foo : 'bar', model : '2106', mark : 'vaz', price : 100500 }, true), '/search/mark-vaz/price-100500?foo=bar&model=2106');
+    });
+
+    it('defaults in sub pattern', function() {
+        var route = Route({
+            defaults : {
+                mark : 'default-mark'
+            },
+            patterns : [
+                {
+                    pattern : '/search/mark-<mark>/year-<year>',
+                    defaults : {
+                        mark : 'default-sub-mark'
+                    }
+                },
+                '/search/mark-<mark>/price-<price>',
+            ]
+        });
+
+        assert.strictEqual(route.build({ year : 2000 }), '/search/mark-default-sub-mark/year-2000');
+        assert.strictEqual(route.build({ price : 100500 }), '/search/mark-default-mark/price-100500');
+    });
+
+    it('conditions in sub pattern', function() {
+        var route = Route({
+            conditions : {
+                year : '\\d\\d',
+                'sub-year' : '\\d'
+            },
+            patterns : [
+                {
+                    pattern : '/search/year-sub-<sub-year>',
+                    conditions : {
+                        'sub-year' : '\\d\\d\\d\\d'
+                    }
+                },
+                '/search/year-<year>',
+            ]
+        });
+
+        assert.strictEqual(route.build({ 'sub-year' : 2000 }), '/search/year-sub-2000');
+        assert.strictEqual(route.build({ 'sub-year' : 20 }), '/search/year-?sub-year=20');
+        assert.strictEqual(route.build({ 'sub-year' : 40 }, true), null);
+        assert.strictEqual(route.build({ year : 10 }, true), '/search/year-10');
+    });
+});

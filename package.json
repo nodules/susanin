@@ -1,37 +1,40 @@
 {
-    "name" : "susanin",
-    "version" : "1.0.3",
-    "author" : {
-        "name" : "Ruslan Kerimov",
-        "email" : "rus.kerimov@gmail.com"
+    "name": "susanin",
+    "version": "1.0.3",
+    "author": {
+        "name": "Ruslan Kerimov",
+        "email": "rus.kerimov@gmail.com"
     },
-    "description" : "Router system which can be used in any JavaScript environments",
-    "keywords" : [ "router", "routes", "routing" ],
-    "repository" : {
-        "type" : "git",
-        "url" : "git://github.com/nodules/susanin.git"
+    "description": "Router system which can be used in any JavaScript environments",
+    "keywords": [
+        "router",
+        "routes",
+        "routing"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/nodules/susanin.git"
     },
-    "scripts" : {
-        "test" : "make test"
+    "scripts": {
+        "test": "make test"
     },
-    "dependencies" : {},
-    "devDependencies" : {
-        "jshint" : "2.1.10",
-        "jscs" : "1.0.5",
-        "istanbul" : "0.1.x",
-        "mocha" : "1.11.x",
-        "chai" : "1.7.x",
-        "borschik" : "0.3.x",
-        "karma" : "~0.12.24",
-        "karma-chrome-launcher" : "~0.1.5",
-        "karma-firefox-launcher" : "~0.1.3",
-        "karma-phantomjs-launcher" : "~0.1.4",
-        "karma-mocha" : "~0.1.9"
+    "dependencies": {},
+    "devDependencies": {
+        "borschik": "0.3.x",
+        "chai": "1.7.x",
+        "istanbul": "0.1.x",
+        "jscs": "1.0.5",
+        "jshint": "2.1.10",
+        "karma": "~4.4.1",
+        "karma-chrome-launcher": "^3.1.0",
+        "karma-firefox-launcher": "^1.2.0",
+        "karma-mocha": "^1.3.0",
+        "mocha": "^6.2.2"
     },
-    "optionalDependencies" : {},
-    "main" : "lib/router.js",
-    "bugs" : {
-        "url" : "https://github.com/nodules/susanin/issues"
+    "optionalDependencies": {},
+    "main": "lib/router.js",
+    "bugs": {
+        "url": "https://github.com/nodules/susanin/issues"
     },
-    "license" : "MIT"
+    "license": "MIT"
 }

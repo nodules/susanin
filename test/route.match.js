@@ -245,4 +245,32 @@ describe('route.match()', function() {
         done();
     });
 
+    it('Support of multiple patterns', function(done) {
+        var route = Route({
+            patterns : [
+                '/search',
+                '/search/mark-<mark>',
+                '/search/mark-<mark>/year-<year>',
+                '/search/mark-<mark>/price-<price>',
+                '/search/mark-<mark>(/<model>)',
+                '/search/mark-<mark>/<model>',
+                '/search/mark-<mark>(/<model>)/year-<year>'
+            ]
+        });
+
+        assert.deepEqual(route.match('/search'), {});
+        assert.deepEqual(route.match('/search?foo=bar'), { foo : 'bar' });
+        assert.deepEqual(route.match('/search?model=corona'), { model : 'corona' });
+        assert.deepEqual(route.match('/search?year=1993'), { year : '1993' });
+        assert.deepEqual(route.match('/search?model=toyota&year=1993'), { model : 'toyota', year : '1993' });
+        assert.deepEqual(route.match('/search/mark-toyota'), { mark : 'toyota' });
+        assert.deepEqual(route.match('/search/mark-toyota?foo=bar'), { mark : 'toyota', foo : 'bar' });
+        assert.deepEqual(route.match('/search/mark-toyota/year-1993'), { mark : 'toyota', year : '1993' });
+        assert.deepEqual(route.match('/search/mark-toyota/corona'), { mark : 'toyota', model : 'corona' });
+        assert.deepEqual(route.match('/search/mark-toyota/corona/year-1993'), { mark : 'toyota', model : 'corona', year : '1993' });
+        assert.deepEqual(route.match('/search/mark-toyota/price-20000'), { mark : 'toyota', price : '20000' });
+
+        done();
+    });
+
 });
