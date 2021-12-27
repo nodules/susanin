@@ -215,7 +215,7 @@ var PARAM_NAME_REGEXP_SOURCE = '[a-zA-Z_][\\w\\-]*';
  * @const
  * @type {String}
  */
-var PARAM_VALUE_REGEXP_SOURCE = '[\\w\\-\\.~]+';
+var PARAM_VALUE_REGEXP_SOURCE = '[\\w\\-\\.~=%]+';
 
 /**
  * @const
