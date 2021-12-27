@@ -61,4 +61,18 @@ describe('Route', function() {
         done();
     });
 
+    it('route pattern may contain % and =', function(done) {
+        var route, result;
+        try {
+            route = new Route({ pattern : '/path/<id>' });
+            result = route.match('/path/a--=%2Fa');
+
+        } catch (e) {
+            assert.ok(false);
+        }
+        assert.ok(result);
+        assert.ok(result.id === 'a--=%2Fa');
+
+        done();
+    });
 });
